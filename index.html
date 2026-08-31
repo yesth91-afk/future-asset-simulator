@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="자산시뮬레이터">
+  
+  <title>미래 자산 시뮬레이터 | 부부 합산 10년 자산 성장 예측</title>
+  
+  <!-- Open Graph Meta (카카오톡, SNS 공유 시 미리보기 카드) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="미래 자산 시뮬레이터 - 부부 합산 10년 자산 예측">
+  <meta property="og:description" content="부동산, 주식, 코인, 현금, 빚을 종합 분석하여 10년 뒤 우리 가구의 순자산과 재무 상태를 시뮬레이션해보세요.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- QRCode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+            },
+            slate: {
+              850: '#141e30',
+              950: '#070d18',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070d18; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950 pb-12 sm:pb-6">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900/95 border border-emerald-500/40 text-emerald-400 text-xs sm:text-sm font-semibold shadow-2xl backdrop-blur-md">
+    <i class="fa-solid fa-circle-check text-base"></i>
+    <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-950/50">
+          <i class="fa-solid fa-chart-line text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base sm:text-lg text-white tracking-tight">자산 시뮬레이터</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Vercel LIVE
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">부부 분리 입력 · 5대 자산 복리 성장 · 순자산/총자산 막대 & 빚 상환 추이</p>
+        </div>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="handleQuickShare()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition active:scale-95">
+          <i class="fa-solid fa-share-nodes"></i>
+          <span>공유하기</span>
+        </button>
+        <button onclick="copySummaryReport()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition active:scale-95">
+          <i class="fa-regular fa-clipboard text-slate-400"></i>
+          <span class="hidden sm:inline">리포트 복사</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Presets Bar -->
+  <div class="bg-slate-900/40 border-b border-slate-800/80 py-2.5 px-4 sm:px-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 text-slate-300">
+        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+        <span class="font-semibold text-slate-200">추천 시나리오 프리셋:</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <button onclick="applyPreset('newlywed')" class="px-3 py-1 rounded-full font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/80 transition">
+          신혼부부 (30대 맞벌이)
+        </button>
+        <button onclick="applyPreset('homeowners')" class="px-3 py-1 rounded-full font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/80 transition">
+          내집마련 3040 부부
+        </button>
+        <button onclick="applyPreset('single')" class="px-3 py-1 rounded-full font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/80 transition">
+          1인 가구
+        </button>
+        <button onclick="resetToDefaults()" class="px-3 py-1 rounded-full font-medium bg-rose-950/40 text-rose-300 hover:bg-rose-900/60 border border-rose-800/50 transition">
+          <i class="fa-solid fa-rotate-left mr-1"></i>초기화
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT COLUMN: CONTROLS & INPUTS -->
+    <section class="lg:col-span-5 space-y-5">
+      
+      <!-- Person Switcher Tabs -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-1.5 shadow-sm flex items-center gap-1.5">
+        <button id="btn-tab-p1" onclick="switchInputTab('p1')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md shadow-blue-600/30 transition">
+          <i class="fa-solid fa-user"></i>
+          <span>본인 입력</span>
+        </button>
+        <button id="btn-tab-p2" onclick="switchInputTab('p2')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-heart text-pink-400"></i>
+          <span>배우자 입력</span>
+        </button>
+        <button id="btn-tab-both" onclick="switchInputTab('both')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-users"></i>
+          <span>가구 합산 보기</span>
+        </button>
+      </div>
+
+      <!-- Household Proportions Gauge -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-3.5 text-xs flex flex-col gap-2">
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="font-semibold flex items-center gap-1.5 text-slate-200">
+            <i class="fa-solid fa-scale-balanced text-indigo-400"></i> 가구 총자산 기여도
+          </span>
+          <span id="label-proportions" class="text-[11px] text-slate-400 font-medium">본인 50% : 배우자 50%</span>
+        </div>
+        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden flex border border-slate-800">
+          <div id="bar-p1-ratio" class="bg-blue-500 h-full transition-all duration-300" style="width: 50%;"></div>
+          <div id="bar-p2-ratio" class="bg-pink-500 h-full transition-all duration-300" style="width: 50%;"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+          <span>합산 월 소득: <strong id="val-sum-income" class="text-white">0원</strong></span>
+          <span>합산 저축률: <strong id="val-sum-savingrate" class="text-emerald-400">0%</strong></span>
+        </div>
+      </div>
+
+      <!-- 1. 월 현금흐름 카드 -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-wallet text-emerald-400 text-base"></i>
+            <h2 id="title-cashflow" class="font-bold text-white text-sm sm:text-base">1. 월 현금흐름 (본인)</h2>
+          </div>
+          <span id="badge-cashflow" class="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+            본인 담당
+          </span>
+        </div>
+
+        <!-- Cashflow inputs -->
+        <div id="inputs-cashflow-container" class="space-y-3">
+          <div>
+            <div class="flex justify-between items-center mb-1 text-xs">
+              <label id="lbl-income" class="text-slate-400 font-medium">세후 월 소득</label>
+              <span id="lbl-partner-income" class="text-slate-500 text-[11px]">배우자: 0원</span>
+            </div>
+            <div class="relative">
+              <input type="number" id="inp-income" step="100000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 pr-10 text-sm">
+              <span class="absolute right-3 top-2.5 text-xs text-slate-400">원</span>
+            </div>
+            <!-- Quick Increment Chips -->
+            <div class="flex items-center gap-1 mt-1.5 overflow-x-auto pb-1 text-[10px]">
+              <button onclick="addValueTo('income', 500000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+50만</button>
+              <button onclick="addValueTo('income', 1000000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+100만</button>
+              <button onclick="addValueTo('income', 2000000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+200만</button>
+              <span id="txt-income-won" class="ml-auto text-[11px] text-slate-400 font-medium truncate">0원</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1 text-xs">
+              <label id="lbl-expense" class="text-slate-400 font-medium">월 생활비 및 개인지출</label>
+              <span id="lbl-partner-expense" class="text-slate-500 text-[11px]">배우자: 0원</span>
+            </div>
+            <div class="relative">
+              <input type="number" id="inp-expense" step="100000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 pr-10 text-sm">
+              <span class="absolute right-3 top-2.5 text-xs text-slate-400">원</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px] mt-1.5">
+              <div class="flex items-center gap-1 text-[10px]">
+                <button onclick="addValueTo('expense', 200000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+20만</button>
+                <button onclick="addValueTo('expense', 500000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+50만</button>
+              </div>
+              <div class="text-right">
+                <span class="text-slate-400">월 잉여금:</span>
+                <span id="txt-surplus-won" class="text-emerald-400 font-bold ml-1">0원</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combined Cashflow Readonly Summary -->
+        <div id="combined-cashflow-view" class="hidden space-y-2 text-xs">
+          <div class="p-2.5 bg-slate-950 rounded-xl flex justify-between items-center border border-slate-800">
+            <span class="text-slate-400">가구 총 세후 월소득</span>
+            <div class="text-right">
+              <div id="comb-income-val" class="text-white font-bold text-sm">0원</div>
+              <div id="comb-income-sub" class="text-[10px] text-slate-400">(본인: 0원 / 배우자: 0원)</div>
+            </div>
+          </div>
+          <div class="p-2.5 bg-slate-950 rounded-xl flex justify-between items-center border border-slate-800">
+            <span class="text-slate-400">가구 총 월 생활비</span>
+            <div class="text-right">
+              <div id="comb-expense-val" class="text-rose-300 font-bold text-sm">0원</div>
+              <div id="comb-expense-sub" class="text-[10px] text-slate-400">(본인: 0원 / 배우자: 0원)</div>
+            </div>
+          </div>
+          <div class="p-2.5 bg-slate-950 rounded-xl flex justify-between items-center border border-emerald-900/40">
+            <span class="text-slate-300 font-medium">가구 월 잉여 여유자금</span>
+            <div id="comb-surplus-val" class="text-emerald-400 font-bold text-sm">0원</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 자산 현황 및 수익률 설정 카드 -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-indigo-400 text-base"></i>
+            <h2 id="title-assets" class="font-bold text-white text-sm sm:text-base">2. 자산 및 빚 (본인)</h2>
+          </div>
+          <span class="text-[11px] text-slate-400">기대 복리 연이율(%)</span>
+        </div>
+
+        <!-- 5대 자산군 리스트 -->
+        
+        <!-- 부동산 -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+              <span class="font-semibold text-xs text-slate-200">부동산</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-slate-400">연상승률:</span>
+              <input type="number" id="rate-realestate" step="0.5" class="w-14 bg-slate-900 border border-slate-700 text-center rounded-lg px-1 py-0.5 text-xs text-blue-400 font-bold focus:border-blue-500 focus:outline-none">
+              <span class="text-xs text-slate-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">평가 가액</label>
+              <input type="number" id="inp-re-asset" step="5000000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-blue-500 font-medium">
+              <div id="txt-re-asset-won" class="text-[10px] text-slate-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">월 추가 투입</label>
+              <input type="number" id="inp-re-alloc" step="100000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-blue-500 font-medium">
+              <div id="txt-re-alloc-won" class="text-[10px] text-slate-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 주식 -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+              <span class="font-semibold text-xs text-slate-200">주식 (국내/해외/ETF)</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-slate-400">기대수익:</span>
+              <input type="number" id="rate-stocks" step="0.5" class="w-14 bg-slate-900 border border-slate-700 text-center rounded-lg px-1 py-0.5 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
+              <span class="text-xs text-slate-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">평가액</label>
+              <input type="number" id="inp-stock-asset" step="1000000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 font-medium">
+              <div id="txt-stock-asset-won" class="text-[10px] text-slate-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">월 매수액</label>
+              <input type="number" id="inp-stock-alloc" step="100000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 font-medium">
+              <div id="txt-stock-alloc-won" class="text-[10px] text-slate-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 코인 (가상자산) -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+              <span class="font-semibold text-xs text-slate-200">코인 (가상자산)</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-slate-400">기대수익:</span>
+              <input type="number" id="rate-crypto" step="1.0" class="w-14 bg-slate-900 border border-slate-700 text-center rounded-lg px-1 py-0.5 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none">
+              <span class="text-xs text-slate-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">평가액</label>
+              <input type="number" id="inp-crypto-asset" step="1000000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500 font-medium">
+              <div id="txt-crypto-asset-won" class="text-[10px] text-slate-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">월 매수액</label>
+              <input type="number" id="inp-crypto-alloc" step="50000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500 font-medium">
+              <div id="txt-crypto-alloc-won" class="text-[10px] text-slate-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 현금 / 예적금 -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+              <span class="font-semibold text-xs text-slate-200">현금 / 예적금</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-slate-400">예금이자:</span>
+              <input type="number" id="rate-cash" step="0.2" class="w-14 bg-slate-900 border border-slate-700 text-center rounded-lg px-1 py-0.5 text-xs text-purple-400 font-bold focus:border-purple-500 focus:outline-none">
+              <span class="text-xs text-slate-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">보유 잔액</label>
+              <input type="number" id="inp-cash-asset" step="1000000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-purple-500 font-medium">
+              <div id="txt-cash-asset-won" class="text-[10px] text-slate-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">월 저축액</label>
+              <input type="number" id="inp-cash-alloc" step="100000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-purple-500 font-medium">
+              <div id="txt-cash-alloc-won" class="text-[10px] text-slate-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 부채 / 빚 (대출) -->
+        <div class="p-3 bg-rose-950/20 rounded-xl border border-rose-900/40 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+              <span class="font-semibold text-xs text-rose-300">부채 / 빚 (대출)</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-rose-300/80">대출이자:</span>
+              <input type="number" id="rate-debt" step="0.2" class="w-14 bg-slate-900 border border-rose-800 text-center rounded-lg px-1 py-0.5 text-xs text-rose-400 font-bold focus:border-rose-500 focus:outline-none">
+              <span class="text-xs text-rose-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-rose-300/80 block mb-0.5">대출 잔액</label>
+              <input type="number" id="inp-debt-asset" step="1000000" class="w-full bg-slate-900 border border-rose-900/60 rounded-lg px-2 py-1.5 text-rose-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
+              <div id="txt-debt-asset-won" class="text-[10px] text-rose-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-rose-300/80 block mb-0.5">월 원리금 상환</label>
+              <input type="number" id="inp-debt-alloc" step="100000" class="w-full bg-slate-900 border border-rose-900/60 rounded-lg px-2 py-1.5 text-rose-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
+              <div id="txt-debt-alloc-won" class="text-[10px] text-rose-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: METRIC CARDS, CHARTS, MILESTONES, INSIGHTS -->
+    <section class="lg:col-span-7 space-y-6">
+      
+      <!-- Key 3 KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <!-- 총자산 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 relative overflow-hidden shadow-sm">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>가구 총자산 (합산)</span>
+            <i class="fa-solid fa-coins text-blue-400 text-sm"></i>
+          </div>
+          <div class="mt-2">
+            <span id="kpi-total-assets" class="text-xl sm:text-2xl font-black text-white tracking-tight">0원</span>
+          </div>
+          <div class="mt-2 text-xs text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800/80">
+            <span>10년 뒤 예상:</span>
+            <span id="kpi-total-assets-10y" class="text-blue-400 font-bold">0원</span>
+          </div>
+        </div>
+
+        <!-- 부채/빚 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 relative overflow-hidden shadow-sm">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>가구 총부채 (빚/대출)</span>
+            <i class="fa-solid fa-credit-card text-rose-400 text-sm"></i>
+          </div>
+          <div class="mt-2">
+            <span id="kpi-total-debt" class="text-xl sm:text-2xl font-black text-rose-400 tracking-tight">0원</span>
+          </div>
+          <div class="mt-2 text-xs text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800/80">
+            <span>10년 뒤 잔여 빚:</span>
+            <span id="kpi-total-debt-10y" class="text-rose-400 font-bold">0원</span>
+          </div>
+        </div>
+
+        <!-- 순자산 (Highlight) -->
+        <div class="bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-4 relative overflow-hidden shadow-lg shadow-emerald-950/30">
+          <div class="text-xs text-emerald-400 font-bold flex items-center justify-between">
+            <span>가구 순자산 (총자산 - 빚)</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-500/20 text-[10px] text-emerald-300 border border-emerald-500/30 font-bold">
+              핵심
+            </span>
+          </div>
+          <div class="mt-2">
+            <span id="kpi-net-worth" class="text-xl sm:text-2xl font-black text-emerald-300 tracking-tight">0원</span>
+          </div>
+          <div class="mt-2 text-xs text-slate-300 flex items-center justify-between pt-2 border-t border-emerald-900/50">
+            <span>10년 뒤 순자산:</span>
+            <div class="flex items-center gap-1">
+              <span id="kpi-net-worth-10y" class="text-emerald-400 font-bold">0원</span>
+              <span id="kpi-growth-badge" class="text-[10px] text-emerald-300 font-bold bg-emerald-950 px-1 rounded border border-emerald-800">+0%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation Tabs for Right Section -->
+      <div class="border-b border-slate-800 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold">
+        <button id="nav-btn-chart" onclick="switchRightTab('chart')" class="pb-3 px-3 sm:px-4 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>성장 시뮬레이션 (막대+라인)</span>
+        </button>
+        <button id="nav-btn-pie" onclick="switchRightTab('pie')" class="pb-3 px-3 sm:px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>포트폴리오 배분</span>
+        </button>
+        <button id="nav-btn-table" onclick="switchRightTab('table')" class="pb-3 px-3 sm:px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-table-list"></i>
+          <span>연도별 마일스톤 표</span>
+        </button>
+        <button id="nav-btn-insights" onclick="switchRightTab('insights')" class="pb-3 px-3 sm:px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>재무 진단</span>
+        </button>
+      </div>
+
+      <!-- VIEW 1: Main Composed Chart -->
+      <div id="view-chart" class="space-y-5">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                <span>📊 순자산·총자산 막대(Bar) & 빚 상환(Line) 추이</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">총자산과 순자산의 성장을 막대그래프로, 부채의 감소 과정을 꺾은선으로 비교합니다.</p>
+            </div>
+            <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 self-start sm:self-auto text-xs">
+              <button onclick="setSimulationHorizon(5)" id="btn-hz-5" class="px-2.5 py-1 font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">5년</button>
+              <button onclick="setSimulationHorizon(10)" id="btn-hz-10" class="px-2.5 py-1 font-semibold rounded-lg bg-emerald-600 text-white shadow transition">10년</button>
+              <button onclick="setSimulationHorizon(20)" id="btn-hz-20" class="px-2.5 py-1 font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">20년</button>
+              <button onclick="setSimulationHorizon(30)" id="btn-hz-30" class="px-2.5 py-1 font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">30년</button>
+            </div>
+          </div>
+
+          <div class="h-80 sm:h-96 w-full relative">
+            <canvas id="growthChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Mini Milestone Snapshots -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-slate-700 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-bold text-slate-300">1년 뒤</span>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </div>
+            <div id="ms-card-networth-1" class="mt-2 text-sm sm:text-base font-bold text-white tracking-tight">0원</div>
+            <div id="ms-card-diff-1" class="mt-0.5 text-[11px] text-emerald-400 font-semibold">+0원</div>
+            <div class="mt-2 text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 flex justify-between">
+              <span>총: <span id="ms-card-tot-1" class="text-slate-300">0</span></span>
+              <span class="text-rose-400">빚: <span id="ms-card-debt-1">0</span></span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-slate-700 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-bold text-slate-300">3년 뒤</span>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </div>
+            <div id="ms-card-networth-3" class="mt-2 text-sm sm:text-base font-bold text-white tracking-tight">0원</div>
+            <div id="ms-card-diff-3" class="mt-0.5 text-[11px] text-emerald-400 font-semibold">+0원</div>
+            <div class="mt-2 text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 flex justify-between">
+              <span>총: <span id="ms-card-tot-3" class="text-slate-300">0</span></span>
+              <span class="text-rose-400">빚: <span id="ms-card-debt-3">0</span></span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-slate-700 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-bold text-slate-300">5년 뒤</span>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </div>
+            <div id="ms-card-networth-5" class="mt-2 text-sm sm:text-base font-bold text-white tracking-tight">0원</div>
+            <div id="ms-card-diff-5" class="mt-0.5 text-[11px] text-emerald-400 font-semibold">+0원</div>
+            <div class="mt-2 text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 flex justify-between">
+              <span>총: <span id="ms-card-tot-5" class="text-slate-300">0</span></span>
+              <span class="text-rose-400">빚: <span id="ms-card-debt-5">0</span></span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-slate-700 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-bold text-slate-300">10년 뒤</span>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </div>
+            <div id="ms-card-networth-10" class="mt-2 text-sm sm:text-base font-bold text-white tracking-tight">0원</div>
+            <div id="ms-card-diff-10" class="mt-0.5 text-[11px] text-emerald-400 font-semibold">+0원</div>
+            <div class="mt-2 text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 flex justify-between">
+              <span>총: <span id="ms-card-tot-10" class="text-slate-300">0</span></span>
+              <span class="text-rose-400">빚: <span id="ms-card-debt-10">0</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Portfolio Donut Charts -->
+      <div id="view-pie" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-6 shadow-sm">
+        <div>
+          <h3 class="font-bold text-white text-base">가구 현재 vs 10년 뒤 자산 구성비 비교</h3>
+          <p class="text-xs text-slate-400">부부 합산 자산별 복리 속도와 월 적립 비중에 따른 10년 후의 포트폴리오 변화입니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center">
+            <h4 class="text-xs font-bold text-slate-300 mb-3">현재 합산 포트폴리오</h4>
+            <div class="h-52 w-52 relative">
+              <canvas id="currentPieChart"></canvas>
+            </div>
+            <div id="currentPieLegends" class="w-full grid grid-cols-2 gap-2 mt-4 text-xs"></div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center">
+            <h4 class="text-xs font-bold text-slate-300 mb-3">10년 뒤 예상 포트폴리오</h4>
+            <div class="h-52 w-52 relative">
+              <canvas id="futurePieChart"></canvas>
+            </div>
+            <div id="futurePieLegends" class="w-full grid grid-cols-2 gap-2 mt-4 text-xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: Detailed Milestone Table -->
+      <div id="view-table" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+        <div>
+          <h3 class="font-bold text-white text-base">📈 가구 합산 미래 자산 시뮬레이션 상세 테이블</h3>
+          <p class="text-xs text-slate-400">현재, 1년, 3년, 5년, 10년 뒤의 부부 합산 자산 및 부채 변화를 일목요연하게 비교합니다.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-slate-300">
+                <th class="py-3 px-3 font-bold">카테고리</th>
+                <th class="py-3 px-3 font-semibold">현재</th>
+                <th class="py-3 px-3 font-semibold text-emerald-400">1년 뒤</th>
+                <th class="py-3 px-3 font-semibold text-emerald-400">3년 뒤</th>
+                <th class="py-3 px-3 font-semibold text-emerald-400">5년 뒤</th>
+                <th class="py-3 px-3 font-semibold text-emerald-400">10년 뒤</th>
+              </tr>
+            </thead>
+            <tbody id="milestone-table-body" class="divide-y divide-slate-800/60 font-medium"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <p>• <strong>합산 원칙:</strong> 본인과 배우자가 매월 납입하는 투자액 및 대출 상환액이 모두 합산되어 가구 전체 단위로 복리 운용됩니다.</p>
+          <p>• <strong>부채 상환:</strong> 매월 상환하는 원리금에 따라 매년 대출 원금이 줄어들며, 전액 상환 시 추가 이자 비용이 발생하지 않습니다.</p>
+        </div>
+      </div>
+
+      <!-- VIEW 4: Financial Insights & Diagnosis -->
+      <div id="view-insights" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-sparkles text-amber-400 text-lg"></i>
+          <h3 class="font-bold text-white text-base">부부 맞춤형 재무 진단 인사이트</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-emerald-400"></i>
+              <h4 class="font-bold text-slate-200">가구 저축 & 투자 효율성</h4>
+            </div>
+            <p id="insight-saving-text" class="text-slate-300 leading-relaxed"></p>
+          </div>
+
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-blue-400"></i>
+              <h4 class="font-bold text-slate-200">자산 배분 안정성 분석</h4>
+            </div>
+            <p id="insight-risk-text" class="text-slate-300 leading-relaxed"></p>
+          </div>
+
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+              <h4 class="font-bold text-slate-200">가구 부채 및 레버리지 상태</h4>
+            </div>
+            <p id="insight-debt-text" class="text-slate-300 leading-relaxed"></p>
+          </div>
+
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-bullseye text-indigo-400"></i>
+              <h4 class="font-bold text-slate-200">10년 뒤 경제적 자유 지표 (4% 룰)</h4>
+            </div>
+            <p id="insight-fire-text" class="text-slate-300 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <div class="p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl space-y-2 text-xs">
+          <h4 class="font-bold text-emerald-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            부부 순자산 2배 확장을 위한 3대 핵심 액션 플랜
+          </h4>
+          <ul class="text-slate-300 space-y-1.5 list-disc list-inside">
+            <li><strong>공동 저축/투자 자동화:</strong> 급여일 직후 각자의 투자 배분액을 공동 투자 계좌로 자동 이체하여 지출 전 선투자 습관을 유지하세요.</li>
+            <li><strong>연 1회 포트폴리오 리밸런싱:</strong> 매년 말 부부 자산 총결산을 진행하여 목표 비중(주식/코인/부동산)을 재점검하세요.</li>
+            <li><strong>상여금 및 성과급의 부채 조기상환:</strong> 고금리 대출은 비정기 소득 발생 시 우선 중도상환하여 이자 누수를 사전에 차단하세요.</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Share Modal Dialog -->
+  <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i class="fa-solid fa-share-nodes text-indigo-400"></i>
+          시뮬레이션 링크 공유하기
+        </h3>
+        <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- QR Code Container -->
+      <div class="flex flex-col items-center bg-slate-950 p-4 rounded-2xl border border-slate-800">
+        <div id="qrcode" class="p-2.5 bg-white rounded-xl shadow-md"></div>
+        <p class="text-[11px] text-slate-400 mt-2.5">
+          <i class="fa-solid fa-camera mr-1 text-slate-300"></i> 카메라로 비추면 바로 열립니다!
+        </p>
+      </div>
+
+      <!-- Share URL Input -->
+      <div class="space-y-1.5">
+        <label class="text-[11px] text-slate-400 font-semibold block">공유 링크</label>
+        <div class="relative">
+          <input type="text" id="shareUrlInput" readonly class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none select-all pr-16">
+          <button onclick="copyShareUrl()" class="absolute right-1 top-1 bottom-1 px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition">
+            복사
+          </button>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="copyKakaoFormat()" class="flex-1 py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
+          <i class="fa-solid fa-comment"></i>
+          <span>카톡 메시지 복사</span>
+        </button>
+        <button onclick="closeShareModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Engine -->
+  <script>
+    const state = {
+      activeInputTab: 'p1',
+      activeRightTab: 'chart',
+      simHorizon: 10,
+      
+      p1: {
+        income: 3500000,
+        expense: 1500000,
+        assets: { realEstate: 50000000, stocks: 50000000, crypto: 25000000, cash: 15000000, debt: 25000000 },
+        allocations: { realEstate: 0, stocks: 1000000, crypto: 400000, cash: 300000, debtRepayment: 300000 }
+      },
+      p2: {
+        income: 2800000,
+        expense: 1200000,
+        assets: { realEstate: 0, stocks: 30000000, crypto: 10000000, cash: 15000000, debt: 15000000 },
+        allocations: { realEstate: 0, stocks: 600000, crypto: 200000, cash: 300000, debtRepayment: 200000 }
+      },
+      returns: {
+        realEstate: 4.0,
+        stocks: 10.0,
+        crypto: 15.0,
+        cash: 3.0,
+        debtRate: 4.8
+      }
+    };
+
+    const PRESETS = {
+      newlywed: {
+        p1: {
+          income: 4000000,
+          expense: 1800000,
+          assets: { realEstate: 0, stocks: 40000000, crypto: 15000000, cash: 20000000, debt: 10000000 },
+          allocations: { realEstate: 0, stocks: 1200000, crypto: 300000, cash: 400000, debtRepayment: 300000 }
+        },
+        p2: {
+          income: 3200000,
+          expense: 1400000,
+          assets: { realEstate: 0, stocks: 25000000, crypto: 5000000, cash: 15000000, debt: 5000000 },
+          allocations: { realEstate: 0, stocks: 800000, crypto: 200000, cash: 400000, debtRepayment: 200000 }
+        },
+        returns: { realEstate: 4.0, stocks: 9.0, crypto: 12.0, cash: 3.2, debtRate: 4.5 }
+      },
+      homeowners: {
+        p1: {
+          income: 5000000,
+          expense: 2200000,
+          assets: { realEstate: 500000000, stocks: 40000000, crypto: 10000000, cash: 25000000, debt: 250000000 },
+          allocations: { realEstate: 0, stocks: 1000000, crypto: 200000, cash: 300000, debtRepayment: 1300000 }
+        },
+        p2: {
+          income: 3500000,
+          expense: 1800000,
+          assets: { realEstate: 200000000, stocks: 20000000, crypto: 5000000, cash: 15000000, debt: 100000000 },
+          allocations: { realEstate: 0, stocks: 500000, crypto: 100000, cash: 300000, debtRepayment: 800000 }
+        },
+        returns: { realEstate: 4.2, stocks: 8.0, crypto: 10.0, cash: 3.0, debtRate: 4.2 }
+      },
+      single: {
+        p1: {
+          income: 3300000,
+          expense: 1400000,
+          assets: { realEstate: 0, stocks: 30000000, crypto: 15000000, cash: 10000000, debt: 0 },
+          allocations: { realEstate: 0, stocks: 1000000, crypto: 400000, cash: 500000, debtRepayment: 0 }
+        },
+        p2: {
+          income: 0,
+          expense: 0,
+          assets: { realEstate: 0, stocks: 0, crypto: 0, cash: 0, debt: 0 },
+          allocations: { realEstate: 0, stocks: 0, crypto: 0, cash: 0, debt: 0 }
+        },
+        returns: { realEstate: 3.5, stocks: 10.0, crypto: 15.0, cash: 3.0, debtRate: 4.5 }
+      }
+    };
+
+    let growthChartInstance = null;
+    let currentPieInstance = null;
+    let futurePieInstance = null;
+    let qrcodeInstance = null;
+
+    function formatKoreanWon(val) {
+      if (val === null || val === undefined || isNaN(val)) return '0원';
+      const num = Math.round(val);
+      const absNum = Math.abs(num);
+      const sign = num < 0 ? '-' : '';
+
+      if (absNum >= 100000000) {
+        const eok = Math.floor(absNum / 100000000);
+        const man = Math.round((absNum % 100000000) / 10000);
+        if (man === 0) return `${sign}${eok.toLocaleString()}억원`;
+        return `${sign}${eok.toLocaleString()}억 ${man.toLocaleString()}만원`;
+      } else if (absNum >= 10000) {
+        const man = Math.round(absNum / 10000);
+        return `${sign}${man.toLocaleString()}만원`;
+      }
+      return `${sign}${absNum.toLocaleString()}원`;
+    }
+
+    function formatShortCurrency(val) {
+      if (Math.abs(val) >= 100000000) return `${(val / 100000000).toFixed(1)}억`;
+      if (Math.abs(val) >= 10000) return `${Math.round(val / 10000)}만`;
+      return `${val}`;
+    }
+
+    function calculateSimulation() {
+      const combinedAssets = {
+        realEstate: state.p1.assets.realEstate + state.p2.assets.realEstate,
+        stocks: state.p1.assets.stocks + state.p2.assets.stocks,
+        crypto: state.p1.assets.crypto + state.p2.assets.crypto,
+        cash: state.p1.assets.cash + state.p2.assets.cash,
+        debt: state.p1.assets.debt + state.p2.assets.debt
+      };
+
+      const combinedAllocations = {
+        realEstate: state.p1.allocations.realEstate + state.p2.allocations.realEstate,
+        stocks: state.p1.allocations.stocks + state.p2.allocations.stocks,
+        crypto: state.p1.allocations.crypto + state.p2.allocations.crypto,
+        cash: state.p1.allocations.cash + state.p2.allocations.cash,
+        debtRepayment: state.p1.allocations.debtRepayment + state.p2.allocations.debtRepayment
+      };
+
+      const totalIncome = state.p1.income + state.p2.income;
+      const totalExpense = state.p1.expense + state.p2.expense;
+      const totalAlloc = Object.values(combinedAllocations).reduce((a, b) => a + b, 0);
+
+      const yearlyData = [];
+      let currentRE = combinedAssets.realEstate;
+      let currentStock = combinedAssets.stocks;
+      let currentCrypto = combinedAssets.crypto;
+      let currentCash = combinedAssets.cash;
+      let currentDebt = combinedAssets.debt;
+
+      const rRE = (state.returns.realEstate || 0) / 100;
+      const rStock = (state.returns.stocks || 0) / 100;
+      const rCrypto = (state.returns.crypto || 0) / 100;
+      const rCash = (state.returns.cash || 0) / 100;
+      const rDebt = (state.returns.debtRate || 0) / 100;
+
+      const addRE = combinedAllocations.realEstate * 12;
+      const addStock = combinedAllocations.stocks * 12;
+      const addCrypto = combinedAllocations.crypto * 12;
+      const addCash = combinedAllocations.cash * 12;
+      const addDebtRepay = combinedAllocations.debtRepayment * 12;
+
+      for (let year = 0; year <= 30; year++) {
+        if (year > 0) {
+          currentRE = currentRE * (1 + rRE) + addRE * (1 + rRE / 2);
+          currentStock = currentStock * (1 + rStock) + addStock * (1 + rStock / 2);
+          currentCrypto = currentCrypto * (1 + rCrypto) + addCrypto * (1 + rCrypto / 2);
+          currentCash = currentCash * (1 + rCash) + addCash * (1 + rCash / 2);
+
+          if (currentDebt > 0) {
+            const interest = currentDebt * rDebt;
+            const remaining = currentDebt + interest - addDebtRepay;
+            currentDebt = Math.max(0, remaining);
+          }
+        }
+
+        const totalAssets = currentRE + currentStock + currentCrypto + currentCash;
+        const netWorth = totalAssets - currentDebt;
+
+        yearlyData.push({
+          year,
+          label: year === 0 ? '현재' : `${year}년 뒤`,
+          realEstate: Math.round(currentRE),
+          stocks: Math.round(currentStock),
+          crypto: Math.round(currentCrypto),
+          cash: Math.round(currentCash),
+          debt: Math.round(currentDebt),
+          totalAssets: Math.round(totalAssets),
+          netWorth: Math.round(netWorth)
+        });
+      }
+
+      return {
+        yearlyData,
+        combinedAssets,
+        combinedAllocations,
+        totalIncome,
+        totalExpense,
+        totalAlloc,
+        savingsRate: totalIncome > 0 ? ((totalAlloc / totalIncome) * 100).toFixed(1) : 0
+      };
+    }
+
+    function syncUrlHash() {
+      try {
+        const payload = { p1: state.p1, p2: state.p2, r: state.returns };
+        const encoded = encodeURIComponent(btoa(JSON.stringify(payload)));
+        window.history.replaceState(null, '', `#data=${encoded}`);
+      } catch (e) {}
+    }
+
+    function populateInputsFromState() {
+      document.getElementById('rate-realestate').value = state.returns.realEstate;
+      document.getElementById('rate-stocks').value = state.returns.stocks;
+      document.getElementById('rate-crypto').value = state.returns.crypto;
+      document.getElementById('rate-cash').value = state.returns.cash;
+      document.getElementById('rate-debt').value = state.returns.debtRate;
+
+      const isP1 = state.activeInputTab === 'p1';
+      const isBoth = state.activeInputTab === 'both';
+      const curPerson = isP1 ? state.p1 : state.p2;
+      const otherPerson = isP1 ? state.p2 : state.p1;
+
+      document.getElementById('btn-tab-p1').className = isP1
+        ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md shadow-blue-600/30 transition'
+        : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
+
+      document.getElementById('btn-tab-p2').className = state.activeInputTab === 'p2'
+        ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-pink-600 text-white shadow-md shadow-pink-600/30 transition'
+        : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
+
+      document.getElementById('btn-tab-both').className = isBoth
+        ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition'
+        : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
+
+      if (isBoth) {
+        document.getElementById('inputs-cashflow-container').classList.add('hidden');
+        document.getElementById('combined-cashflow-view').classList.remove('hidden');
+        document.getElementById('title-cashflow').innerText = '1. 월 현금흐름 (가구 합산)';
+        document.getElementById('badge-cashflow').innerText = '가구 합산';
+        document.getElementById('badge-cashflow').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
+        document.getElementById('title-assets').innerText = '2. 자산 및 빚 (가구 합산)';
+      } else {
+        document.getElementById('inputs-cashflow-container').classList.remove('hidden');
+        document.getElementById('combined-cashflow-view').classList.add('hidden');
+        const name = isP1 ? '본인' : '배우자';
+        const badgeColor = isP1 ? 'bg-blue-950 text-blue-300 border-blue-800' : 'bg-pink-950 text-pink-300 border-pink-800';
+        document.getElementById('title-cashflow').innerText = `1. 월 현금흐름 (${name})`;
+        document.getElementById('badge-cashflow').innerText = `${name} 담당`;
+        document.getElementById('badge-cashflow').className = `text-[11px] font-bold px-2 py-0.5 rounded ${badgeColor} border`;
+        document.getElementById('title-assets').innerText = `2. 자산 및 빚 (${name})`;
+        
+        document.getElementById('lbl-income').innerText = `${name} 세후 월 소득`;
+        document.getElementById('lbl-partner-income').innerText = `${isP1 ? '배우자' : '본인'}: ${formatKoreanWon(otherPerson.income)}`;
+        document.getElementById('lbl-expense').innerText = `${name} 월 생활비 / 지출`;
+        document.getElementById('lbl-partner-expense').innerText = `${isP1 ? '배우자' : '본인'}: ${formatKoreanWon(otherPerson.expense)}`;
+
+        document.getElementById('inp-income').value = curPerson.income;
+        document.getElementById('inp-expense').value = curPerson.expense;
+      }
+
+      if (isBoth) {
+        document.getElementById('inp-re-asset').value = state.p1.assets.realEstate + state.p2.assets.realEstate;
+        document.getElementById('inp-re-alloc').value = state.p1.allocations.realEstate + state.p2.allocations.realEstate;
+        document.getElementById('inp-stock-asset').value = state.p1.assets.stocks + state.p2.assets.stocks;
+        document.getElementById('inp-stock-alloc').value = state.p1.allocations.stocks + state.p2.allocations.stocks;
+        document.getElementById('inp-crypto-asset').value = state.p1.assets.crypto + state.p2.assets.crypto;
+        document.getElementById('inp-crypto-alloc').value = state.p1.allocations.crypto + state.p2.allocations.crypto;
+        document.getElementById('inp-cash-asset').value = state.p1.assets.cash + state.p2.assets.cash;
+        document.getElementById('inp-cash-alloc').value = state.p1.allocations.cash + state.p2.allocations.cash;
+        document.getElementById('inp-debt-asset').value = state.p1.assets.debt + state.p2.assets.debt;
+        document.getElementById('inp-debt-alloc').value = state.p1.allocations.debtRepayment + state.p2.allocations.debtRepayment;
+      } else {
+        document.getElementById('inp-re-asset').value = curPerson.assets.realEstate;
+        document.getElementById('inp-re-alloc').value = curPerson.allocations.realEstate;
+        document.getElementById('inp-stock-asset').value = curPerson.assets.stocks;
+        document.getElementById('inp-stock-alloc').value = curPerson.allocations.stocks;
+        document.getElementById('inp-crypto-asset').value = curPerson.assets.crypto;
+        document.getElementById('inp-crypto-alloc').value = curPerson.allocations.crypto;
+        document.getElementById('inp-cash-asset').value = curPerson.assets.cash;
+        document.getElementById('inp-cash-alloc').value = curPerson.allocations.cash;
+        document.getElementById('inp-debt-asset').value = curPerson.assets.debt;
+        document.getElementById('inp-debt-alloc').value = curPerson.allocations.debtRepayment;
+      }
+    }
+
+    function updateAll() {
+      populateInputsFromState();
+      const sim = calculateSimulation();
+      const current = sim.yearlyData[0];
+      const y10 = sim.yearlyData[10] || sim.yearlyData[sim.yearlyData.length - 1];
+
+      const p1Tot = Object.values(state.p1.assets).slice(0, 4).reduce((a, b) => a + b, 0);
+      const p2Tot = Object.values(state.p2.assets).slice(0, 4).reduce((a, b) => a + b, 0);
+      const combTot = p1Tot + p2Tot || 1;
+      const p1Ratio = Math.round((p1Tot / combTot) * 100);
+      const p2Ratio = 100 - p1Ratio;
+
+      document.getElementById('label-proportions').innerText = `본인 ${p1Ratio}% : 배우자 ${p2Ratio}%`;
+      document.getElementById('bar-p1-ratio').style.width = `${p1Ratio}%`;
+      document.getElementById('bar-p2-ratio').style.width = `${p2Ratio}%`;
+      document.getElementById('val-sum-income').innerText = formatKoreanWon(sim.totalIncome);
+      document.getElementById('val-sum-savingrate').innerText = `${sim.savingsRate}%`;
+
+      const isP1 = state.activeInputTab === 'p1';
+      const cur = isP1 ? state.p1 : state.p2;
+
+      document.getElementById('txt-income-won').innerText = formatKoreanWon(cur.income);
+      document.getElementById('txt-surplus-won').innerText = formatKoreanWon(Math.max(0, cur.income - cur.expense));
+
+      document.getElementById('txt-re-asset-won').innerText = formatKoreanWon(document.getElementById('inp-re-asset').value);
+      document.getElementById('txt-re-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-re-alloc').value)}`;
+
+      document.getElementById('txt-stock-asset-won').innerText = formatKoreanWon(document.getElementById('inp-stock-asset').value);
+      document.getElementById('txt-stock-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-stock-alloc').value)}`;
+
+      document.getElementById('txt-crypto-asset-won').innerText = formatKoreanWon(document.getElementById('inp-crypto-asset').value);
+      document.getElementById('txt-crypto-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-crypto-alloc').value)}`;
+
+      document.getElementById('txt-cash-asset-won').innerText = formatKoreanWon(document.getElementById('inp-cash-asset').value);
+      document.getElementById('txt-cash-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-cash-alloc').value)}`;
+
+      document.getElementById('txt-debt-asset-won').innerText = formatKoreanWon(document.getElementById('inp-debt-asset').value);
+      document.getElementById('txt-debt-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-debt-alloc').value)}`;
+
+      document.getElementById('comb-income-val').innerText = formatKoreanWon(sim.totalIncome);
+      document.getElementById('comb-income-sub').innerText = `(본인: ${formatKoreanWon(state.p1.income)} / 배우자: ${formatKoreanWon(state.p2.income)})`;
+      document.getElementById('comb-expense-val').innerText = formatKoreanWon(sim.totalExpense);
+      document.getElementById('comb-expense-sub').innerText = `(본인: ${formatKoreanWon(state.p1.expense)} / 배우자: ${formatKoreanWon(state.p2.expense)})`;
+      document.getElementById('comb-surplus-val').innerText = formatKoreanWon(Math.max(0, sim.totalIncome - sim.totalExpense));
+
+      document.getElementById('kpi-total-assets').innerText = formatKoreanWon(current.totalAssets);
+      document.getElementById('kpi-total-assets-10y').innerText = formatKoreanWon(y10.totalAssets);
+
+      document.getElementById('kpi-total-debt').innerText = formatKoreanWon(current.debt);
+      document.getElementById('kpi-total-debt-10y').innerText = y10.debt === 0 ? '전액 상환 🎉' : formatKoreanWon(y10.debt);
+
+      document.getElementById('kpi-net-worth').innerText = formatKoreanWon(current.netWorth);
+      document.getElementById('kpi-net-worth-10y').innerText = formatKoreanWon(y10.netWorth);
+      
+      const growthPct = current.netWorth > 0 ? Math.round(((y10.netWorth - current.netWorth) / current.netWorth) * 100) : 0;
+      document.getElementById('kpi-growth-badge').innerText = `${growthPct > 0 ? '+' : ''}${growthPct}%`;
+
+      [1, 3, 5, 10].forEach(y => {
+        const d = sim.yearlyData[y];
+        if (d) {
+          const diff = d.netWorth - current.netWorth;
+          document.getElementById(`ms-card-networth-${y}`).innerText = formatKoreanWon(d.netWorth);
+          document.getElementById(`ms-card-diff-${y}`).innerText = `+${formatKoreanWon(diff)}`;
+          document.getElementById(`ms-card-tot-${y}`).innerText = formatShortCurrency(d.totalAssets);
+          document.getElementById(`ms-card-debt-${y}`).innerText = formatShortCurrency(d.debt);
+        }
+      });
+
+      renderGrowthChart(sim.yearlyData.slice(0, state.simHorizon + 1));
+      renderPieCharts(current, y10);
+      renderMilestoneTable(sim.yearlyData);
+      renderInsights(sim, current, y10);
+      syncUrlHash();
+    }
+
+    function addValueTo(field, addAmount) {
+      const p = state.activeInputTab === 'p1' ? state.p1 : state.p2;
+      p[field] = (Number(p[field]) || 0) + addAmount;
+      updateAll();
+    }
+
+    function renderGrowthChart(slicedData) {
+      const ctx = document.getElementById('growthChart').getContext('2d');
+      const labels = slicedData.map(d => d.label);
+      const totalAssetsData = slicedData.map(d => d.totalAssets);
+      const netWorthData = slicedData.map(d => d.netWorth);
+      const debtData = slicedData.map(d => d.debt);
+
+      if (growthChartInstance) {
+        growthChartInstance.destroy();
+      }
+
+      growthChartInstance = new Chart(ctx, {
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: '총자산 (막대)',
+              data: totalAssetsData,
+              backgroundColor: 'rgba(59, 130, 246, 0.85)',
+              borderColor: '#3B82F6',
+              borderWidth: 1,
+              borderRadius: 6,
+              order: 2
+            },
+            {
+              type: 'bar',
+              label: '순자산 (막대)',
+              data: netWorthData,
+              backgroundColor: 'rgba(16, 185, 129, 0.85)',
+              borderColor: '#10B981',
+              borderWidth: 1,
+              borderRadius: 6,
+              order: 3
+            },
+            {
+              type: 'line',
+              label: '부채/빚 (라인)',
+              data: debtData,
+              borderColor: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: 3,
+              pointBackgroundColor: '#EF4444',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: false,
+              tension: 0.2,
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: '#94A3B8', font: { size: 12, family: 'Pretendard' }, usePointStyle: true, padding: 15 }
+            },
+            tooltip: {
+              backgroundColor: '#0F172A',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 12,
+              titleFont: { size: 13, family: 'Pretendard', weight: 'bold' },
+              bodyFont: { size: 12, family: 'Pretendard' },
+              callbacks: {
+                label: (context) => ` ${context.dataset.label}: ${formatKoreanWon(context.parsed.y)}`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94A3B8', font: { size: 11, family: 'Pretendard' } } },
+            y: {
+              grid: { color: 'rgba(51, 65, 85, 0.4)' },
+              ticks: { color: '#94A3B8', font: { size: 11, family: 'Pretendard' }, callback: (v) => formatShortCurrency(v) }
+            }
+          }
+        }
+      });
+    }
+
+    function renderPieCharts(curr, y10) {
+      const colors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'];
+      const categories = ['부동산', '주식', '코인', '현금'];
+      const curValues = [curr.realEstate, curr.stocks, curr.crypto, curr.cash];
+      const y10Values = [y10.realEstate, y10.stocks, y10.crypto, y10.cash];
+
+      if (currentPieInstance) currentPieInstance.destroy();
+      const ctxCur = document.getElementById('currentPieChart').getContext('2d');
+      currentPieInstance = new Chart(ctxCur, {
+        type: 'doughnut',
+        data: { labels: categories, datasets: [{ data: curValues, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+      });
+
+      if (futurePieInstance) futurePieInstance.destroy();
+      const ctxFut = document.getElementById('futurePieChart').getContext('2d');
+      futurePieInstance = new Chart(ctxFut, {
+        type: 'doughnut',
+        data: { labels: categories, datasets: [{ data: y10Values, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+      });
+
+      const curTot = curr.totalAssets || 1;
+      const y10Tot = y10.totalAssets || 1;
+
+      document.getElementById('currentPieLegends').innerHTML = categories.map((cat, i) => `
+        <div class="flex items-center justify-between p-1.5 bg-slate-900/60 rounded border border-slate-800/50">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full" style="background-color: ${colors[i]}"></span>
+            <span class="text-slate-300">${cat}</span>
+          </div>
+          <span class="font-bold text-slate-200">${((curValues[i] / curTot) * 100).toFixed(1)}%</span>
+        </div>
+      `).join('');
+
+      document.getElementById('futurePieLegends').innerHTML = categories.map((cat, i) => `
+        <div class="flex items-center justify-between p-1.5 bg-slate-900/60 rounded border border-slate-800/50">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full" style="background-color: ${colors[i]}"></span>
+            <span class="text-slate-300">${cat}</span>
+          </div>
+          <span class="font-bold text-slate-200">${((y10Values[i] / y10Tot) * 100).toFixed(1)}%</span>
+        </div>
+      `).join('');
+    }
+
+    function renderMilestoneTable(data) {
+      const ms = [0, 1, 3, 5, 10].map(y => data[y] || data[0]);
+      const tbody = document.getElementById('milestone-table-body');
+
+      tbody.innerHTML = `
+        <tr class="hover:bg-slate-800/30">
+          <td class="py-3 px-3 text-blue-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-building"></i> 부동산</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.realEstate)}</td>`).join('')}
+        </tr>
+        <tr class="hover:bg-slate-800/30">
+          <td class="py-3 px-3 text-emerald-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-chart-line"></i> 주식</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.stocks)}</td>`).join('')}
+        </tr>
+        <tr class="hover:bg-slate-800/30">
+          <td class="py-3 px-3 text-amber-400 font-semibold flex items-center gap-1.5"><i class="fa-brands fa-bitcoin"></i> 코인</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.crypto)}</td>`).join('')}
+        </tr>
+        <tr class="hover:bg-slate-800/30">
+          <td class="py-3 px-3 text-purple-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-wallet"></i> 현금 / 예금</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.cash)}</td>`).join('')}
+        </tr>
+        <tr class="bg-slate-800/40 font-bold text-white">
+          <td class="py-3 px-3">총자산 (합계)</td>
+          ${ms.map(m => `<td class="py-3 px-3">${formatKoreanWon(m.totalAssets)}</td>`).join('')}
+        </tr>
+        <tr class="text-rose-400 bg-rose-950/20">
+          <td class="py-3 px-3 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-credit-card"></i> 부채 (빚/대출)</td>
+          ${ms.map(m => `<td class="py-3 px-3 font-bold">${m.debt === 0 ? '0원' : `-${formatKoreanWon(m.debt)}`}</td>`).join('')}
+        </tr>
+        <tr class="bg-emerald-950/40 font-extrabold text-emerald-300 border-t-2 border-emerald-500/40 text-sm">
+          <td class="py-3 px-3 flex items-center gap-1.5"><i class="fa-solid fa-sparkles text-emerald-400"></i> 순자산 (자산 - 빚)</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-emerald-400 font-black">${formatKoreanWon(m.netWorth)}</td>`).join('')}
+        </tr>
+      `;
+    }
+
+    function renderInsights(sim, curr, y10) {
+      const sr = Number(sim.savingsRate);
+      let srHtml = `부부 합산 세후 소득 중 <strong>${sim.savingsRate}%</strong>를 저축 및 자산 증식에 투입하고 있습니다. `;
+      if (sr >= 50) {
+        srHtml += `<span class="text-emerald-400 block mt-1">🌟 매우 이상적인 가구 저축률입니다! 두 분의 소득 합산 효과로 복리 성장 속도가 극대화됩니다.</span>`;
+      } else if (sr >= 30) {
+        srHtml += `<span class="text-indigo-300 block mt-1">👍 표준적이고 안정적인 저축률입니다. 고정 지출을 5~10%만 절감해도 10년 뒤 순자산이 수억 원 이상 더 늘어납니다.</span>`;
+      } else {
+        srHtml += `<span class="text-amber-400 block mt-1">⚠️ 저축률이 다소 낮습니다. 부부 간 공동 가계부를 점검하여 월 저축액을 늘리면 복리의 가속도가 훨씬 빨라집니다.</span>`;
+      }
+      document.getElementById('insight-saving-text').innerHTML = srHtml;
+
+      let riskHtml = '';
+      if (curr.totalAssets > 0 && (curr.crypto / curr.totalAssets) * 100 > 25) {
+        riskHtml = `<span class="text-amber-400">가상자산(코인) 비중이 총자산의 25%를 초과하여 변동성 위험이 있습니다. 상승장 시기 점진적으로 우량 주식 및 현금성 자산으로 리밸런싱을 권장합니다.</span>`;
+      } else if (curr.totalAssets > 0 && (curr.realEstate / curr.totalAssets) * 100 > 75) {
+        riskHtml = `<span class="text-blue-300">부동산 비중이 높아 금융 유동성이 제한될 수 있습니다. 배당주, 파킹 통장 등 유동 자산 비중을 20% 이상 확보하는 것이 유리합니다.</span>`;
+      } else {
+        riskHtml = `<span class="text-emerald-300">부동산, 주식, 코인, 현금이 균형 있게 분산되어 있어 시장 사이클 변화에 방어력이 우수한 가구 포트폴리오입니다.</span>`;
+      }
+      document.getElementById('insight-risk-text').innerHTML = riskHtml;
+
+      const debtRatio = curr.totalAssets > 0 ? ((curr.debt / curr.totalAssets) * 100).toFixed(1) : 0;
+      let debtHtml = `현재 가구 총자산 대비 부채 비율은 <strong>${debtRatio}%</strong>입니다. `;
+      if (curr.debt > 0 && state.returns.debtRate > state.returns.cash) {
+        debtHtml += `<span class="text-rose-300 block mt-1">대출 금리(${state.returns.debtRate}%)가 예금 금리(${state.returns.cash}%)보다 높으므로, 여유 현금 발생 시 고금리 부채를 우선 상환하는 것이 확실한 무위험 확정 수익이 됩니다.</span>`;
+      } else {
+        debtHtml += `<span class="text-emerald-300 block mt-1">부채 규모가 안전 범위 내에 잘 통제되고 있습니다.</span>`;
+      }
+      document.getElementById('insight-debt-text').innerHTML = debtHtml;
+
+      const fireAnnual = y10.netWorth * 0.04;
+      const fireMonthly = fireAnnual / 12;
+      document.getElementById('insight-fire-text').innerHTML = `
+        10년 뒤 예상 순자산 <strong>${formatKoreanWon(y10.netWorth)}</strong> 기준, 
+        연 4% 자산 인출 시 연간 <strong>${formatKoreanWon(fireAnnual)}</strong> (월 <strong>${formatKoreanWon(fireMonthly)}</strong>)의 
+        현금흐름을 노동 소득 없이 창출할 수 있게 됩니다.
+      `;
+    }
+
+    function setupEventListeners() {
+      document.getElementById('inp-income').addEventListener('input', (e) => {
+        const val = Math.max(0, Number(e.target.value) || 0);
+        if (state.activeInputTab === 'p1') state.p1.income = val;
+        else if (state.activeInputTab === 'p2') state.p2.income = val;
+        updateAll();
+      });
+
+      document.getElementById('inp-expense').addEventListener('input', (e) => {
+        const val = Math.max(0, Number(e.target.value) || 0);
+        if (state.activeInputTab === 'p1') state.p1.expense = val;
+        else if (state.activeInputTab === 'p2') state.p2.expense = val;
+        updateAll();
+      });
+
+      const bindAsset = (inpId, field, isAlloc = false) => {
+        document.getElementById(inpId).addEventListener('input', (e) => {
+          const val = Math.max(0, Number(e.target.value) || 0);
+          const p = state.activeInputTab === 'p1' ? state.p1 : (state.activeInputTab === 'p2' ? state.p2 : null);
+          if (p) {
+            if (isAlloc) p.allocations[field] = val;
+            else p.assets[field] = val;
+          }
+          updateAll();
+        });
+      };
+
+      bindAsset('inp-re-asset', 'realEstate', false);
+      bindAsset('inp-re-alloc', 'realEstate', true);
+      bindAsset('inp-stock-asset', 'stocks', false);
+      bindAsset('inp-stock-alloc', 'stocks', true);
+      bindAsset('inp-crypto-asset', 'crypto', false);
+      bindAsset('inp-crypto-alloc', 'crypto', true);
+      bindAsset('inp-cash-asset', 'cash', false);
+      bindAsset('inp-cash-alloc', 'cash', true);
+      bindAsset('inp-debt-asset', 'debt', false);
+      bindAsset('inp-debt-alloc', 'debtRepayment', true);
+
+      const bindRate = (inpId, field) => {
+        document.getElementById(inpId).addEventListener('input', (e) => {
+          state.returns[field] = Number(e.target.value) || 0;
+          updateAll();
+        });
+      };
+      bindRate('rate-realestate', 'realEstate');
+      bindRate('rate-stocks', 'stocks');
+      bindRate('rate-crypto', 'crypto');
+      bindRate('rate-cash', 'cash');
+      bindRate('rate-debt', 'debtRate');
+    }
+
+    function switchInputTab(tab) {
+      state.activeInputTab = tab;
+      updateAll();
+    }
+
+    function switchRightTab(tab) {
+      state.activeRightTab = tab;
+      const tabs = ['chart', 'pie', 'table', 'insights'];
+      tabs.forEach(t => {
+        const viewEl = document.getElementById(`view-${t}`);
+        const btnEl = document.getElementById(`nav-btn-${t}`);
+        if (t === tab) {
+          viewEl.classList.remove('hidden');
+          btnEl.className = 'pb-3 px-3 sm:px-4 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition';
+        } else {
+          viewEl.classList.add('hidden');
+          btnEl.className = 'pb-3 px-3 sm:px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition';
+        }
+      });
+    }
+
+    function setSimulationHorizon(years) {
+      state.simHorizon = years;
+      [5, 10, 20, 30].forEach(y => {
+        const btn = document.getElementById(`btn-hz-${y}`);
+        if (y === years) {
+          btn.className = 'px-2.5 py-1 font-semibold rounded-lg bg-emerald-600 text-white shadow transition';
+        } else {
+          btn.className = 'px-2.5 py-1 font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition';
+        }
+      });
+      const sim = calculateSimulation();
+      renderGrowthChart(sim.yearlyData.slice(0, years + 1));
+    }
+
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (p) {
+        state.p1 = JSON.parse(JSON.stringify(p.p1));
+        state.p2 = JSON.parse(JSON.stringify(p.p2));
+        state.returns = JSON.parse(JSON.stringify(p.returns));
+        updateAll();
+        showToast(`'${key === 'newlywed' ? '신혼부부' : key === 'homeowners' ? '내집마련 3040' : '1인 가구'}' 프리셋이 적용되었습니다.`);
+      }
+    }
+
+    function resetToDefaults() {
+      applyPreset('newlywed');
+    }
+
+    // Native Web Share API or Modal
+    async function handleQuickShare() {
+      const shareUrl = window.location.href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: '미래 자산 시뮬레이터',
+            text: '우리 가구의 10년 자산 성장 시뮬레이션 결과를 확인해보세요!',
+            url: shareUrl
+          });
+          return;
+        } catch (e) {}
+      }
+      openShareModal();
+    }
+
+    function openShareModal() {
+      const shareUrl = window.location.href;
+      document.getElementById('shareUrlInput').value = shareUrl;
+
+      const qrEl = document.getElementById('qrcode');
+      qrEl.innerHTML = '';
+      qrcodeInstance = new QRCode(qrEl, {
+        text: shareUrl,
+        width: 130,
+        height: 130,
+        colorDark: "#090d16",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById('shareModal').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').classList.add('hidden');
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('shareUrlInput');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      showToast('공유 링크가 클립보드에 복사되었습니다!');
+      setTimeout(closeShareModal, 1200);
+    }
+
+    function copyKakaoFormat() {
+      const sim = calculateSimulation();
+      const current = sim.yearlyData[0];
+      const y10 = sim.yearlyData[10];
+      const shareUrl = window.location.href;
+
+      const kakaoMsg = `[💌 우리 부부 10년 자산 성장 시뮬레이터 결과]
+      
+🏡 현재 가구 순자산: ${formatKoreanWon(current.netWorth)}
+🚀 10년 뒤 예상 순자산: ${formatKoreanWon(y10.netWorth)} (+${formatKoreanWon(y10.netWorth - current.netWorth)})
+💰 매월 함께 모으는 돈: ${formatKoreanWon(sim.totalAlloc)} (저축률 ${sim.savingsRate}%)
+
+👇 아래 링크를 누르면 계산표를 바로 볼 수 있어!
+${shareUrl}`;
+
+      const dummy = document.createElement('textarea');
+      document.body.appendChild(dummy);
+      dummy.value = kakaoMsg;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+
+      showToast('카톡 공유용 메시지가 복사되었습니다!');
+      setTimeout(closeShareModal, 1200);
+    }
+
+    function copySummaryReport() {
+      const sim = calculateSimulation();
+      const current = sim.yearlyData[0];
+      const y10 = sim.yearlyData[10];
+
+      const report = `[📊 부부 합산 미래 자산 시뮬레이터 요약 리포트]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 가구 재무 현황 (합산)
+• 세후 월 소득: ${formatKoreanWon(sim.totalIncome)} (본인: ${formatKoreanWon(state.p1.income)} / 배우자: ${formatKoreanWon(state.p2.income)})
+• 월 생활 지출: ${formatKoreanWon(sim.totalExpense)}
+• 월 저축/투자액: ${formatKoreanWon(sim.totalAlloc)} (가구 저축률 ${sim.savingsRate}%)
+
+■ 자산 현황 (현재)
+• 가구 총자산: ${formatKoreanWon(current.totalAssets)}
+  - 부동산: ${formatKoreanWon(current.realEstate)}
+  - 주식: ${formatKoreanWon(current.stocks)}
+  - 코인: ${formatKoreanWon(current.crypto)}
+  - 현금: ${formatKoreanWon(current.cash)}
+• 가구 총부채(빚): ${formatKoreanWon(current.debt)} (본인: ${formatKoreanWon(state.p1.assets.debt)} / 배우자: ${formatKoreanWon(state.p2.assets.debt)})
+• 가구 순자산: ${formatKoreanWon(current.netWorth)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 미래 자산 시뮬레이션 (10년 예측)
+• 1년 뒤: 순자산 ${formatKoreanWon(sim.yearlyData[1]?.netWorth)} (총자산: ${formatKoreanWon(sim.yearlyData[1]?.totalAssets)})
+• 3년 뒤: 순자산 ${formatKoreanWon(sim.yearlyData[3]?.netWorth)} (총자산: ${formatKoreanWon(sim.yearlyData[3]?.totalAssets)})
+• 5년 뒤: 순자산 ${formatKoreanWon(sim.yearlyData[5]?.netWorth)} (총자산: ${formatKoreanWon(sim.yearlyData[5]?.totalAssets)})
+• 10년 뒤: 순자산 ${formatKoreanWon(y10?.netWorth)} (총자산: ${formatKoreanWon(y10?.totalAssets)}, 부채: ${formatKoreanWon(y10?.debt)})
+
+📈 10년 간 순자산 증감: +${formatKoreanWon(y10.netWorth - current.netWorth)}`;
+
+      const dummy = document.createElement('textarea');
+      document.body.appendChild(dummy);
+      dummy.value = report;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+
+      showToast('상세 요약 리포트가 복사되었습니다!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('opacity-0', '-translate-y-20', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-20', 'pointer-events-none');
+      }, 2500);
+    }
+
+    function loadFromUrlHash() {
+      try {
+        if (window.location.hash.includes('#data=')) {
+          const encoded = window.location.hash.replace('#data=', '');
+          const decoded = JSON.parse(atob(decodeURIComponent(encoded)));
+          if (decoded.p1) state.p1 = decoded.p1;
+          if (decoded.p2) state.p2 = decoded.p2;
+          if (decoded.r) state.returns = decoded.r;
+          showToast('공유받은 시뮬레이션 데이터를 불러왔습니다!');
+        }
+      } catch (err) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFromUrlHash();
+      setupEventListeners();
+      updateAll();
+    });
+  </script>
+</body>
+</html>
