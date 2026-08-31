@@ -10,10 +10,10 @@
   
   <title>미래 자산 시뮬레이터 | 부부 합산 10년 자산 성장 예측</title>
   
-  <!-- Open Graph Meta (카카오톡, SNS 공유 시 미리보기 카드) -->
+  <!-- Open Graph Meta -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="미래 자산 시뮬레이터 - 부부 합산 10년 자산 예측">
-  <meta property="og:description" content="부동산, 주식, 코인, 현금, 빚을 종합 분석하여 10년 뒤 우리 가구의 순자산과 재무 상태를 시뮬레이션해보세요.">
+  <meta property="og:description" content="부동산, 주식, 연금, 코인, 현금, 세부 대출을 종합 분석하여 10년 뒤 우리 가구의 순자산과 재무 상태를 시뮬레이션해보세요.">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -37,11 +37,6 @@
             sans: ['Pretendard', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
           },
           colors: {
-            brand: {
-              50: '#eef2ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-            },
             slate: {
               850: '#141e30',
               950: '#070d18',
@@ -53,7 +48,6 @@
   </script>
 
   <style>
-    /* Smooth Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #070d18; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
@@ -61,11 +55,6 @@
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950 pb-12 sm:pb-6">
@@ -90,7 +79,7 @@
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Vercel LIVE
             </span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">부부 분리 입력 · 5대 자산 복리 성장 · 순자산/총자산 막대 & 빚 상환 추이</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">가구 합산 · 부동산/주식/연금/코인/현금 · 개별 대출 맞춤 상환 시뮬레이션</p>
         </div>
       </div>
 
@@ -100,7 +89,7 @@
           <i class="fa-solid fa-share-nodes"></i>
           <span>공유하기</span>
         </button>
-        <button onclick="copySummaryReport()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition active:scale-95">
+        <button onclick="copySummaryReport()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition active:scale-95">
           <i class="fa-regular fa-clipboard text-slate-400"></i>
           <span class="hidden sm:inline">리포트 복사</span>
         </button>
@@ -138,19 +127,19 @@
     <!-- LEFT COLUMN: CONTROLS & INPUTS -->
     <section class="lg:col-span-5 space-y-5">
       
-      <!-- Person Switcher Tabs -->
+      <!-- Person Switcher Tabs (가구 합산 우선) -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-1.5 shadow-sm flex items-center gap-1.5">
-        <button id="btn-tab-p1" onclick="switchInputTab('p1')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md shadow-blue-600/30 transition">
+        <button id="btn-tab-both" onclick="switchInputTab('both')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition">
+          <i class="fa-solid fa-users"></i>
+          <span>가구 합산 보기</span>
+        </button>
+        <button id="btn-tab-p1" onclick="switchInputTab('p1')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-user"></i>
           <span>본인 입력</span>
         </button>
         <button id="btn-tab-p2" onclick="switchInputTab('p2')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-heart text-pink-400"></i>
           <span>배우자 입력</span>
-        </button>
-        <button id="btn-tab-both" onclick="switchInputTab('both')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-users"></i>
-          <span>가구 합산 보기</span>
         </button>
       </div>
 
@@ -177,25 +166,24 @@
         <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-wallet text-emerald-400 text-base"></i>
-            <h2 id="title-cashflow" class="font-bold text-white text-sm sm:text-base">1. 월 현금흐름 (본인)</h2>
+            <h2 id="title-cashflow" class="font-bold text-white text-sm sm:text-base">1. 월 현금흐름 (가구 합산)</h2>
           </div>
-          <span id="badge-cashflow" class="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
-            본인 담당
+          <span id="badge-cashflow" class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+            가구 합산
           </span>
         </div>
 
-        <!-- Cashflow inputs -->
-        <div id="inputs-cashflow-container" class="space-y-3">
+        <!-- Cashflow inputs (본인/배우자 탭일 때 활성화) -->
+        <div id="inputs-cashflow-container" class="space-y-3 hidden">
           <div>
             <div class="flex justify-between items-center mb-1 text-xs">
               <label id="lbl-income" class="text-slate-400 font-medium">세후 월 소득</label>
-              <span id="lbl-partner-income" class="text-slate-500 text-[11px]">배우자: 0원</span>
+              <span id="lbl-partner-income" class="text-slate-500 text-[11px]">상대방: 0원</span>
             </div>
             <div class="relative">
               <input type="number" id="inp-income" step="100000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 pr-10 text-sm">
               <span class="absolute right-3 top-2.5 text-xs text-slate-400">원</span>
             </div>
-            <!-- Quick Increment Chips -->
             <div class="flex items-center gap-1 mt-1.5 overflow-x-auto pb-1 text-[10px]">
               <button onclick="addValueTo('income', 500000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+50만</button>
               <button onclick="addValueTo('income', 1000000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">+100만</button>
@@ -207,7 +195,7 @@
           <div>
             <div class="flex justify-between items-center mb-1 text-xs">
               <label id="lbl-expense" class="text-slate-400 font-medium">월 생활비 및 개인지출</label>
-              <span id="lbl-partner-expense" class="text-slate-500 text-[11px]">배우자: 0원</span>
+              <span id="lbl-partner-expense" class="text-slate-500 text-[11px]">상대방: 0원</span>
             </div>
             <div class="relative">
               <input type="number" id="inp-expense" step="100000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 pr-10 text-sm">
@@ -226,8 +214,8 @@
           </div>
         </div>
 
-        <!-- Combined Cashflow Readonly Summary -->
-        <div id="combined-cashflow-view" class="hidden space-y-2 text-xs">
+        <!-- Combined Cashflow View (가구 합산 탭일 때 활성화) -->
+        <div id="combined-cashflow-view" class="space-y-2 text-xs">
           <div class="p-2.5 bg-slate-950 rounded-xl flex justify-between items-center border border-slate-800">
             <span class="text-slate-400">가구 총 세후 월소득</span>
             <div class="text-right">
@@ -246,22 +234,21 @@
             <span class="text-slate-300 font-medium">가구 월 잉여 여유자금</span>
             <div id="comb-surplus-val" class="text-emerald-400 font-bold text-sm">0원</div>
           </div>
+          <p class="text-[11px] text-slate-400 text-center pt-1">* 개별 소득/지출 수정은 상단 <strong>[본인 입력]</strong> 또는 <strong>[배우자 입력]</strong> 탭을 클릭하세요.</p>
         </div>
       </div>
 
-      <!-- 2. 자산 현황 및 수익률 설정 카드 -->
+      <!-- 2. 자산 현황 및 수익률 설정 카드 (5대 자산) -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5">
         <div class="flex items-center justify-between pb-3 border-b border-slate-800">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-sliders text-indigo-400 text-base"></i>
-            <h2 id="title-assets" class="font-bold text-white text-sm sm:text-base">2. 자산 및 빚 (본인)</h2>
+            <h2 id="title-assets" class="font-bold text-white text-sm sm:text-base">2. 자산 현황 및 기대수익률</h2>
           </div>
-          <span class="text-[11px] text-slate-400">기대 복리 연이율(%)</span>
+          <span class="text-[11px] text-slate-400">연 복리 수익률(%)</span>
         </div>
 
-        <!-- 5대 자산군 리스트 -->
-        
-        <!-- 부동산 -->
+        <!-- 1. 부동산 -->
         <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -288,7 +275,7 @@
           </div>
         </div>
 
-        <!-- 주식 -->
+        <!-- 2. 주식 (국내/해외/ETF) -->
         <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -315,7 +302,34 @@
           </div>
         </div>
 
-        <!-- 코인 (가상자산) -->
+        <!-- 3. 개인/퇴직연금 (IRP, 연금저축, DC/DB) -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-cyan-400"></div>
+              <span class="font-semibold text-xs text-slate-200">개인/퇴직연금 (IRP·연금저축·DC)</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[11px] text-slate-400">기대수익:</span>
+              <input type="number" id="rate-pension" step="0.5" class="w-14 bg-slate-900 border border-slate-700 text-center rounded-lg px-1 py-0.5 text-xs text-cyan-400 font-bold focus:border-cyan-500 focus:outline-none">
+              <span class="text-xs text-slate-400">%</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">연금 평가액</label>
+              <input type="number" id="inp-pension-asset" step="1000000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500 font-medium">
+              <div id="txt-pension-asset-won" class="text-[10px] text-slate-400 mt-0.5 truncate">0원</div>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-0.5">월 납입/적립액</label>
+              <input type="number" id="inp-pension-alloc" step="100000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500 font-medium">
+              <div id="txt-pension-alloc-won" class="text-[10px] text-slate-400 mt-0.5 truncate">월 0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 코인 (가상자산) -->
         <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -342,7 +356,7 @@
           </div>
         </div>
 
-        <!-- 현금 / 예적금 -->
+        <!-- 5. 현금 / 예적금 -->
         <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -369,33 +383,28 @@
           </div>
         </div>
 
-        <!-- 부채 / 빚 (대출) -->
-        <div class="p-3 bg-rose-950/20 rounded-xl border border-rose-900/40 space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-              <span class="font-semibold text-xs text-rose-300">부채 / 빚 (대출)</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <span class="text-[11px] text-rose-300/80">대출이자:</span>
-              <input type="number" id="rate-debt" step="0.2" class="w-14 bg-slate-900 border border-rose-800 text-center rounded-lg px-1 py-0.5 text-xs text-rose-400 font-bold focus:border-rose-500 focus:outline-none">
-              <span class="text-xs text-rose-400">%</span>
-            </div>
+      </div>
+
+      <!-- 3. 부채 / 빚 (대출) 세부 관리 (상시 추가 및 금리 수정 가능) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-credit-card text-rose-400 text-base"></i>
+            <h2 id="title-debts" class="font-bold text-white text-sm sm:text-base">3. 부채/대출 세부 관리</h2>
           </div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <label class="text-[11px] text-rose-300/80 block mb-0.5">대출 잔액</label>
-              <input type="number" id="inp-debt-asset" step="1000000" class="w-full bg-slate-900 border border-rose-900/60 rounded-lg px-2 py-1.5 text-rose-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
-              <div id="txt-debt-asset-won" class="text-[10px] text-rose-400 mt-0.5 truncate">0원</div>
-            </div>
-            <div>
-              <label class="text-[11px] text-rose-300/80 block mb-0.5">월 원리금 상환</label>
-              <input type="number" id="inp-debt-alloc" step="100000" class="w-full bg-slate-900 border border-rose-900/60 rounded-lg px-2 py-1.5 text-rose-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
-              <div id="txt-debt-alloc-won" class="text-[10px] text-rose-400 mt-0.5 truncate">월 0원</div>
-            </div>
-          </div>
+          <button id="btn-add-debt" onclick="addNewDebtItem()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-900/40 transition active:scale-95">
+            <i class="fa-solid fa-plus text-[10px]"></i> 대출 추가
+          </button>
         </div>
 
+        <!-- Dynamic Debt Rows Container -->
+        <div id="debt-items-container" class="space-y-3">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <div id="debt-empty-msg" class="hidden p-4 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/60">
+          등록된 대출(부채)이 없습니다. 우측 상단의 <strong>[+ 대출 추가]</strong> 버튼을 눌러보세요! 🎉
+        </div>
       </div>
 
     </section>
@@ -424,7 +433,7 @@
         <!-- 부채/빚 -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 relative overflow-hidden shadow-sm">
           <div class="text-xs text-slate-400 flex items-center justify-between">
-            <span>가구 총부채 (빚/대출)</span>
+            <span>가구 총부채 (세부 빚 합계)</span>
             <i class="fa-solid fa-credit-card text-rose-400 text-sm"></i>
           </div>
           <div class="mt-2">
@@ -486,7 +495,7 @@
               <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
                 <span>📊 순자산·총자산 막대(Bar) & 빚 상환(Line) 추이</span>
               </h3>
-              <p class="text-xs text-slate-400 mt-0.5">총자산과 순자산의 성장을 막대그래프로, 부채의 감소 과정을 꺾은선으로 비교합니다.</p>
+              <p class="text-xs text-slate-400 mt-0.5">부동산·주식·연금·코인·현금의 성장을 막대로, 세부 대출 상환 과정을 꺾은선으로 비교합니다.</p>
             </div>
             <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 self-start sm:self-auto text-xs">
               <button onclick="setSimulationHorizon(5)" id="btn-hz-5" class="px-2.5 py-1 font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">5년</button>
@@ -561,7 +570,7 @@
       <div id="view-pie" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-6 shadow-sm">
         <div>
           <h3 class="font-bold text-white text-base">가구 현재 vs 10년 뒤 자산 구성비 비교</h3>
-          <p class="text-xs text-slate-400">부부 합산 자산별 복리 속도와 월 적립 비중에 따른 10년 후의 포트폴리오 변화입니다.</p>
+          <p class="text-xs text-slate-400">부동산, 주식, 개인/퇴직연금, 코인, 현금의 10년 후 포트폴리오 변화입니다.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -587,7 +596,7 @@
       <div id="view-table" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
         <div>
           <h3 class="font-bold text-white text-base">📈 가구 합산 미래 자산 시뮬레이션 상세 테이블</h3>
-          <p class="text-xs text-slate-400">현재, 1년, 3년, 5년, 10년 뒤의 부부 합산 자산 및 부채 변화를 일목요연하게 비교합니다.</p>
+          <p class="text-xs text-slate-400">현재, 1년, 3년, 5년, 10년 뒤의 5대 자산과 부채 변화를 일목요연하게 비교합니다.</p>
         </div>
 
         <div class="overflow-x-auto">
@@ -607,8 +616,8 @@
         </div>
 
         <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 text-[11px] text-slate-400 space-y-1">
-          <p>• <strong>합산 원칙:</strong> 본인과 배우자가 매월 납입하는 투자액 및 대출 상환액이 모두 합산되어 가구 전체 단위로 복리 운용됩니다.</p>
-          <p>• <strong>부채 상환:</strong> 매월 상환하는 원리금에 따라 매년 대출 원금이 줄어들며, 전액 상환 시 추가 이자 비용이 발생하지 않습니다.</p>
+          <p>• <strong>연금 분리:</strong> 개인/퇴직연금은 절세 계좌의 복리 효과를 주식과 별도로 정확히 분리 추정합니다.</p>
+          <p>• <strong>대출 상환:</strong> 주담대, 신용대출, 회사대출 등 각 대출별 설정된 금리와 상환액에 따라 순차 상환됩니다.</p>
         </div>
       </div>
 
@@ -631,7 +640,7 @@
           <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-shield-halved text-blue-400"></i>
-              <h4 class="font-bold text-slate-200">자산 배분 안정성 분석</h4>
+              <h4 class="font-bold text-slate-200">자산 배분 및 연금 안정성</h4>
             </div>
             <p id="insight-risk-text" class="text-slate-300 leading-relaxed"></p>
           </div>
@@ -639,7 +648,7 @@
           <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
-              <h4 class="font-bold text-slate-200">가구 부채 및 레버리지 상태</h4>
+              <h4 class="font-bold text-slate-200">세부 대출 및 DSR 위험도</h4>
             </div>
             <p id="insight-debt-text" class="text-slate-300 leading-relaxed"></p>
           </div>
@@ -651,18 +660,6 @@
             </div>
             <p id="insight-fire-text" class="text-slate-300 leading-relaxed"></p>
           </div>
-        </div>
-
-        <div class="p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl space-y-2 text-xs">
-          <h4 class="font-bold text-emerald-300 flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-check text-emerald-400"></i>
-            부부 순자산 2배 확장을 위한 3대 핵심 액션 플랜
-          </h4>
-          <ul class="text-slate-300 space-y-1.5 list-disc list-inside">
-            <li><strong>공동 저축/투자 자동화:</strong> 급여일 직후 각자의 투자 배분액을 공동 투자 계좌로 자동 이체하여 지출 전 선투자 습관을 유지하세요.</li>
-            <li><strong>연 1회 포트폴리오 리밸런싱:</strong> 매년 말 부부 자산 총결산을 진행하여 목표 비중(주식/코인/부동산)을 재점검하세요.</li>
-            <li><strong>상여금 및 성과급의 부채 조기상환:</strong> 고금리 대출은 비정기 소득 발생 시 우선 중도상환하여 이자 누수를 사전에 차단하세요.</li>
-          </ul>
         </div>
       </div>
 
@@ -682,7 +679,6 @@
         </button>
       </div>
 
-      <!-- QR Code Container -->
       <div class="flex flex-col items-center bg-slate-950 p-4 rounded-2xl border border-slate-800">
         <div id="qrcode" class="p-2.5 bg-white rounded-xl shadow-md"></div>
         <p class="text-[11px] text-slate-400 mt-2.5">
@@ -690,7 +686,6 @@
         </p>
       </div>
 
-      <!-- Share URL Input -->
       <div class="space-y-1.5">
         <label class="text-[11px] text-slate-400 font-semibold block">공유 링크</label>
         <div class="relative">
@@ -716,76 +711,100 @@
   <!-- JavaScript Engine -->
   <script>
     const state = {
-      activeInputTab: 'p1',
+      activeInputTab: 'both', // 기본 탭: 가구 합산 보기
       activeRightTab: 'chart',
       simHorizon: 10,
       
       p1: {
+        name: '본인',
         income: 3500000,
         expense: 1500000,
-        assets: { realEstate: 50000000, stocks: 50000000, crypto: 25000000, cash: 15000000, debt: 25000000 },
-        allocations: { realEstate: 0, stocks: 1000000, crypto: 400000, cash: 300000, debtRepayment: 300000 }
+        assets: { realEstate: 50000000, stocks: 40000000, pension: 15000000, crypto: 20000000, cash: 15000000 },
+        allocations: { realEstate: 0, stocks: 800000, pension: 300000, crypto: 300000, cash: 300000 },
+        debts: [
+          { id: 'p1_d1', name: '주택담보대출', amount: 30000000, rate: 4.2, monthlyRepay: 300000 },
+          { id: 'p1_d2', name: '신용대출', amount: 10000000, rate: 5.5, monthlyRepay: 200000 }
+        ]
       },
       p2: {
+        name: '배우자',
         income: 2800000,
         expense: 1200000,
-        assets: { realEstate: 0, stocks: 30000000, crypto: 10000000, cash: 15000000, debt: 15000000 },
-        allocations: { realEstate: 0, stocks: 600000, crypto: 200000, cash: 300000, debtRepayment: 200000 }
+        assets: { realEstate: 0, stocks: 25000000, pension: 10000000, crypto: 5000000, cash: 15000000 },
+        allocations: { realEstate: 0, stocks: 500000, pension: 200000, crypto: 100000, cash: 300000 },
+        debts: [
+          { id: 'p2_d1', name: '회사대출', amount: 15000000, rate: 3.0, monthlyRepay: 200000 }
+        ]
       },
       returns: {
         realEstate: 4.0,
-        stocks: 10.0,
-        crypto: 15.0,
-        cash: 3.0,
-        debtRate: 4.8
+        stocks: 9.5,
+        pension: 6.5,
+        crypto: 12.0,
+        cash: 3.0
       }
     };
 
     const PRESETS = {
       newlywed: {
         p1: {
+          name: '본인',
           income: 4000000,
           expense: 1800000,
-          assets: { realEstate: 0, stocks: 40000000, crypto: 15000000, cash: 20000000, debt: 10000000 },
-          allocations: { realEstate: 0, stocks: 1200000, crypto: 300000, cash: 400000, debtRepayment: 300000 }
+          assets: { realEstate: 0, stocks: 35000000, pension: 15000000, crypto: 10000000, cash: 20000000 },
+          allocations: { realEstate: 0, stocks: 1000000, pension: 300000, crypto: 200000, cash: 400000 },
+          debts: [{ id: 'd1', name: '전세/주담대', amount: 20000000, rate: 4.5, monthlyRepay: 300000 }]
         },
         p2: {
+          name: '배우자',
           income: 3200000,
           expense: 1400000,
-          assets: { realEstate: 0, stocks: 25000000, crypto: 5000000, cash: 15000000, debt: 5000000 },
-          allocations: { realEstate: 0, stocks: 800000, crypto: 200000, cash: 400000, debtRepayment: 200000 }
+          assets: { realEstate: 0, stocks: 20000000, pension: 10000000, crypto: 5000000, cash: 15000000 },
+          allocations: { realEstate: 0, stocks: 600000, pension: 200000, crypto: 100000, cash: 400000 },
+          debts: [{ id: 'd2', name: '신용대출', amount: 10000000, rate: 5.2, monthlyRepay: 200000 }]
         },
-        returns: { realEstate: 4.0, stocks: 9.0, crypto: 12.0, cash: 3.2, debtRate: 4.5 }
+        returns: { realEstate: 4.0, stocks: 9.0, pension: 6.5, crypto: 12.0, cash: 3.2 }
       },
       homeowners: {
         p1: {
+          name: '본인',
           income: 5000000,
           expense: 2200000,
-          assets: { realEstate: 500000000, stocks: 40000000, crypto: 10000000, cash: 25000000, debt: 250000000 },
-          allocations: { realEstate: 0, stocks: 1000000, crypto: 200000, cash: 300000, debtRepayment: 1300000 }
+          assets: { realEstate: 500000000, stocks: 30000000, pension: 25000000, crypto: 10000000, cash: 20000000 },
+          allocations: { realEstate: 0, stocks: 800000, pension: 300000, crypto: 100000, cash: 300000 },
+          debts: [
+            { id: 'd1', name: '아파트 주담대', amount: 250000000, rate: 4.2, monthlyRepay: 1200000 },
+            { id: 'd2', name: '회사 복지대출', amount: 30000000, rate: 2.5, monthlyRepay: 300000 }
+          ]
         },
         p2: {
+          name: '배우자',
           income: 3500000,
           expense: 1800000,
-          assets: { realEstate: 200000000, stocks: 20000000, crypto: 5000000, cash: 15000000, debt: 100000000 },
-          allocations: { realEstate: 0, stocks: 500000, crypto: 100000, cash: 300000, debtRepayment: 800000 }
+          assets: { realEstate: 200000000, stocks: 15000000, pension: 15000000, crypto: 5000000, cash: 15000000 },
+          allocations: { realEstate: 0, stocks: 400000, pension: 200000, crypto: 50000, cash: 250000 },
+          debts: [{ id: 'd3', name: '주담대 분담', amount: 100000000, rate: 4.2, monthlyRepay: 600000 }]
         },
-        returns: { realEstate: 4.2, stocks: 8.0, crypto: 10.0, cash: 3.0, debtRate: 4.2 }
+        returns: { realEstate: 4.2, stocks: 8.0, pension: 6.0, crypto: 10.0, cash: 3.0 }
       },
       single: {
         p1: {
-          income: 3300000,
-          expense: 1400000,
-          assets: { realEstate: 0, stocks: 30000000, crypto: 15000000, cash: 10000000, debt: 0 },
-          allocations: { realEstate: 0, stocks: 1000000, crypto: 400000, cash: 500000, debtRepayment: 0 }
+          name: '본인',
+          income: 3500000,
+          expense: 1500000,
+          assets: { realEstate: 0, stocks: 30000000, pension: 15000000, crypto: 15000000, cash: 10000000 },
+          allocations: { realEstate: 0, stocks: 900000, pension: 300000, crypto: 300000, cash: 500000 },
+          debts: []
         },
         p2: {
+          name: '배우자',
           income: 0,
           expense: 0,
-          assets: { realEstate: 0, stocks: 0, crypto: 0, cash: 0, debt: 0 },
-          allocations: { realEstate: 0, stocks: 0, crypto: 0, cash: 0, debt: 0 }
+          assets: { realEstate: 0, stocks: 0, pension: 0, crypto: 0, cash: 0 },
+          allocations: { realEstate: 0, stocks: 0, pension: 0, crypto: 0, cash: 0 },
+          debts: []
         },
-        returns: { realEstate: 3.5, stocks: 10.0, crypto: 15.0, cash: 3.0, debtRate: 4.5 }
+        returns: { realEstate: 3.5, stocks: 10.0, pension: 7.0, crypto: 15.0, cash: 3.0 }
       }
     };
 
@@ -820,69 +839,87 @@
 
     function calculateSimulation() {
       const combinedAssets = {
-        realEstate: state.p1.assets.realEstate + state.p2.assets.realEstate,
-        stocks: state.p1.assets.stocks + state.p2.assets.stocks,
-        crypto: state.p1.assets.crypto + state.p2.assets.crypto,
-        cash: state.p1.assets.cash + state.p2.assets.cash,
-        debt: state.p1.assets.debt + state.p2.assets.debt
+        realEstate: (state.p1.assets.realEstate || 0) + (state.p2.assets.realEstate || 0),
+        stocks: (state.p1.assets.stocks || 0) + (state.p2.assets.stocks || 0),
+        pension: (state.p1.assets.pension || 0) + (state.p2.assets.pension || 0),
+        crypto: (state.p1.assets.crypto || 0) + (state.p2.assets.crypto || 0),
+        cash: (state.p1.assets.cash || 0) + (state.p2.assets.cash || 0),
       };
 
       const combinedAllocations = {
-        realEstate: state.p1.allocations.realEstate + state.p2.allocations.realEstate,
-        stocks: state.p1.allocations.stocks + state.p2.allocations.stocks,
-        crypto: state.p1.allocations.crypto + state.p2.allocations.crypto,
-        cash: state.p1.allocations.cash + state.p2.allocations.cash,
-        debtRepayment: state.p1.allocations.debtRepayment + state.p2.allocations.debtRepayment
+        realEstate: (state.p1.allocations.realEstate || 0) + (state.p2.allocations.realEstate || 0),
+        stocks: (state.p1.allocations.stocks || 0) + (state.p2.allocations.stocks || 0),
+        pension: (state.p1.allocations.pension || 0) + (state.p2.allocations.pension || 0),
+        crypto: (state.p1.allocations.crypto || 0) + (state.p2.allocations.crypto || 0),
+        cash: (state.p1.allocations.cash || 0) + (state.p2.allocations.cash || 0),
       };
 
-      const totalIncome = state.p1.income + state.p2.income;
-      const totalExpense = state.p1.expense + state.p2.expense;
-      const totalAlloc = Object.values(combinedAllocations).reduce((a, b) => a + b, 0);
+      const allDebts = [...(state.p1.debts || []), ...(state.p2.debts || [])];
+      const initialTotalDebt = allDebts.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+      const totalDebtMonthlyRepay = allDebts.reduce((sum, d) => sum + (Number(d.monthlyRepay) || 0), 0);
+
+      const totalIncome = (state.p1.income || 0) + (state.p2.income || 0);
+      const totalExpense = (state.p1.expense || 0) + (state.p2.expense || 0);
+      const totalAssetAlloc = Object.values(combinedAllocations).reduce((a, b) => a + b, 0);
+      const totalAlloc = totalAssetAlloc + totalDebtMonthlyRepay;
 
       const yearlyData = [];
       let currentRE = combinedAssets.realEstate;
       let currentStock = combinedAssets.stocks;
+      let currentPension = combinedAssets.pension;
       let currentCrypto = combinedAssets.crypto;
       let currentCash = combinedAssets.cash;
-      let currentDebt = combinedAssets.debt;
+
+      // Clone debts for tracking individual amortization
+      let simDebts = allDebts.map(d => ({
+        amount: Number(d.amount) || 0,
+        rate: (Number(d.rate) || 0) / 100,
+        annualRepay: (Number(d.monthlyRepay) || 0) * 12
+      }));
 
       const rRE = (state.returns.realEstate || 0) / 100;
       const rStock = (state.returns.stocks || 0) / 100;
+      const rPension = (state.returns.pension || 0) / 100;
       const rCrypto = (state.returns.crypto || 0) / 100;
       const rCash = (state.returns.cash || 0) / 100;
-      const rDebt = (state.returns.debtRate || 0) / 100;
 
       const addRE = combinedAllocations.realEstate * 12;
       const addStock = combinedAllocations.stocks * 12;
+      const addPension = combinedAllocations.pension * 12;
       const addCrypto = combinedAllocations.crypto * 12;
       const addCash = combinedAllocations.cash * 12;
-      const addDebtRepay = combinedAllocations.debtRepayment * 12;
 
       for (let year = 0; year <= 30; year++) {
         if (year > 0) {
           currentRE = currentRE * (1 + rRE) + addRE * (1 + rRE / 2);
           currentStock = currentStock * (1 + rStock) + addStock * (1 + rStock / 2);
+          currentPension = currentPension * (1 + rPension) + addPension * (1 + rPension / 2);
           currentCrypto = currentCrypto * (1 + rCrypto) + addCrypto * (1 + rCrypto / 2);
           currentCash = currentCash * (1 + rCash) + addCash * (1 + rCash / 2);
 
-          if (currentDebt > 0) {
-            const interest = currentDebt * rDebt;
-            const remaining = currentDebt + interest - addDebtRepay;
-            currentDebt = Math.max(0, remaining);
-          }
+          // Individual Debt Amortization
+          simDebts.forEach(d => {
+            if (d.amount > 0) {
+              const interest = d.amount * d.rate;
+              const remaining = d.amount + interest - d.annualRepay;
+              d.amount = Math.max(0, remaining);
+            }
+          });
         }
 
-        const totalAssets = currentRE + currentStock + currentCrypto + currentCash;
-        const netWorth = totalAssets - currentDebt;
+        const totalDebtNow = simDebts.reduce((sum, d) => sum + d.amount, 0);
+        const totalAssets = currentRE + currentStock + currentPension + currentCrypto + currentCash;
+        const netWorth = totalAssets - totalDebtNow;
 
         yearlyData.push({
           year,
           label: year === 0 ? '현재' : `${year}년 뒤`,
           realEstate: Math.round(currentRE),
           stocks: Math.round(currentStock),
+          pension: Math.round(currentPension),
           crypto: Math.round(currentCrypto),
           cash: Math.round(currentCash),
-          debt: Math.round(currentDebt),
+          debt: Math.round(totalDebtNow),
           totalAssets: Math.round(totalAssets),
           netWorth: Math.round(netWorth)
         });
@@ -892,6 +929,8 @@
         yearlyData,
         combinedAssets,
         combinedAllocations,
+        initialTotalDebt,
+        totalDebtMonthlyRepay,
         totalIncome,
         totalExpense,
         totalAlloc,
@@ -910,14 +949,19 @@
     function populateInputsFromState() {
       document.getElementById('rate-realestate').value = state.returns.realEstate;
       document.getElementById('rate-stocks').value = state.returns.stocks;
+      document.getElementById('rate-pension').value = state.returns.pension;
       document.getElementById('rate-crypto').value = state.returns.crypto;
       document.getElementById('rate-cash').value = state.returns.cash;
-      document.getElementById('rate-debt').value = state.returns.debtRate;
 
-      const isP1 = state.activeInputTab === 'p1';
       const isBoth = state.activeInputTab === 'both';
+      const isP1 = state.activeInputTab === 'p1';
       const curPerson = isP1 ? state.p1 : state.p2;
       const otherPerson = isP1 ? state.p2 : state.p1;
+
+      // Tab Buttons Styling
+      document.getElementById('btn-tab-both').className = isBoth
+        ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition'
+        : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
 
       document.getElementById('btn-tab-p1').className = isP1
         ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md shadow-blue-600/30 transition'
@@ -927,17 +971,25 @@
         ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-pink-600 text-white shadow-md shadow-pink-600/30 transition'
         : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
 
-      document.getElementById('btn-tab-both').className = isBoth
-        ? 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition'
-        : 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
-
       if (isBoth) {
         document.getElementById('inputs-cashflow-container').classList.add('hidden');
         document.getElementById('combined-cashflow-view').classList.remove('hidden');
         document.getElementById('title-cashflow').innerText = '1. 월 현금흐름 (가구 합산)';
         document.getElementById('badge-cashflow').innerText = '가구 합산';
         document.getElementById('badge-cashflow').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
-        document.getElementById('title-assets').innerText = '2. 자산 및 빚 (가구 합산)';
+        document.getElementById('title-assets').innerText = '2. 자산 현황 (가구 합산)';
+        document.getElementById('title-debts').innerText = '3. 부채/대출 세부 관리 (가구 합산)';
+
+        document.getElementById('inp-re-asset').value = (state.p1.assets.realEstate || 0) + (state.p2.assets.realEstate || 0);
+        document.getElementById('inp-re-alloc').value = (state.p1.allocations.realEstate || 0) + (state.p2.allocations.realEstate || 0);
+        document.getElementById('inp-stock-asset').value = (state.p1.assets.stocks || 0) + (state.p2.assets.stocks || 0);
+        document.getElementById('inp-stock-alloc').value = (state.p1.allocations.stocks || 0) + (state.p2.allocations.stocks || 0);
+        document.getElementById('inp-pension-asset').value = (state.p1.assets.pension || 0) + (state.p2.assets.pension || 0);
+        document.getElementById('inp-pension-alloc').value = (state.p1.allocations.pension || 0) + (state.p2.allocations.pension || 0);
+        document.getElementById('inp-crypto-asset').value = (state.p1.assets.crypto || 0) + (state.p2.assets.crypto || 0);
+        document.getElementById('inp-crypto-alloc').value = (state.p1.allocations.crypto || 0) + (state.p2.allocations.crypto || 0);
+        document.getElementById('inp-cash-asset').value = (state.p1.assets.cash || 0) + (state.p2.assets.cash || 0);
+        document.getElementById('inp-cash-alloc').value = (state.p1.allocations.cash || 0) + (state.p2.allocations.cash || 0);
       } else {
         document.getElementById('inputs-cashflow-container').classList.remove('hidden');
         document.getElementById('combined-cashflow-view').classList.add('hidden');
@@ -946,8 +998,9 @@
         document.getElementById('title-cashflow').innerText = `1. 월 현금흐름 (${name})`;
         document.getElementById('badge-cashflow').innerText = `${name} 담당`;
         document.getElementById('badge-cashflow').className = `text-[11px] font-bold px-2 py-0.5 rounded ${badgeColor} border`;
-        document.getElementById('title-assets').innerText = `2. 자산 및 빚 (${name})`;
-        
+        document.getElementById('title-assets').innerText = `2. 자산 현황 (${name})`;
+        document.getElementById('title-debts').innerText = `3. 부채/대출 세부 관리 (${name})`;
+
         document.getElementById('lbl-income').innerText = `${name} 세후 월 소득`;
         document.getElementById('lbl-partner-income').innerText = `${isP1 ? '배우자' : '본인'}: ${formatKoreanWon(otherPerson.income)}`;
         document.getElementById('lbl-expense').innerText = `${name} 월 생활비 / 지출`;
@@ -955,30 +1008,140 @@
 
         document.getElementById('inp-income').value = curPerson.income;
         document.getElementById('inp-expense').value = curPerson.expense;
-      }
 
-      if (isBoth) {
-        document.getElementById('inp-re-asset').value = state.p1.assets.realEstate + state.p2.assets.realEstate;
-        document.getElementById('inp-re-alloc').value = state.p1.allocations.realEstate + state.p2.allocations.realEstate;
-        document.getElementById('inp-stock-asset').value = state.p1.assets.stocks + state.p2.assets.stocks;
-        document.getElementById('inp-stock-alloc').value = state.p1.allocations.stocks + state.p2.allocations.stocks;
-        document.getElementById('inp-crypto-asset').value = state.p1.assets.crypto + state.p2.assets.crypto;
-        document.getElementById('inp-crypto-alloc').value = state.p1.allocations.crypto + state.p2.allocations.crypto;
-        document.getElementById('inp-cash-asset').value = state.p1.assets.cash + state.p2.assets.cash;
-        document.getElementById('inp-cash-alloc').value = state.p1.allocations.cash + state.p2.allocations.cash;
-        document.getElementById('inp-debt-asset').value = state.p1.assets.debt + state.p2.assets.debt;
-        document.getElementById('inp-debt-alloc').value = state.p1.allocations.debtRepayment + state.p2.allocations.debtRepayment;
-      } else {
         document.getElementById('inp-re-asset').value = curPerson.assets.realEstate;
         document.getElementById('inp-re-alloc').value = curPerson.allocations.realEstate;
         document.getElementById('inp-stock-asset').value = curPerson.assets.stocks;
         document.getElementById('inp-stock-alloc').value = curPerson.allocations.stocks;
+        document.getElementById('inp-pension-asset').value = curPerson.assets.pension;
+        document.getElementById('inp-pension-alloc').value = curPerson.allocations.pension;
         document.getElementById('inp-crypto-asset').value = curPerson.assets.crypto;
         document.getElementById('inp-crypto-alloc').value = curPerson.allocations.crypto;
         document.getElementById('inp-cash-asset').value = curPerson.assets.cash;
         document.getElementById('inp-cash-alloc').value = curPerson.allocations.cash;
-        document.getElementById('inp-debt-asset').value = curPerson.assets.debt;
-        document.getElementById('inp-debt-alloc').value = curPerson.allocations.debtRepayment;
+      }
+
+      renderDebtInputs();
+    }
+
+    // Render Dynamic Debt Rows
+    function renderDebtInputs() {
+      const container = document.getElementById('debt-items-container');
+      const emptyMsg = document.getElementById('debt-empty-msg');
+      const isBoth = state.activeInputTab === 'both';
+      
+      let debtsToDisplay = [];
+      if (isBoth) {
+        debtsToDisplay = [
+          ...(state.p1.debts || []).map(d => ({ ...d, owner: '본인', isP1: true })),
+          ...(state.p2.debts || []).map(d => ({ ...d, owner: '배우자', isP1: false }))
+        ];
+      } else {
+        const cur = state.activeInputTab === 'p1' ? state.p1 : state.p2;
+        debtsToDisplay = (cur.debts || []).map(d => ({ ...d, owner: cur.name, isP1: state.activeInputTab === 'p1' }));
+      }
+
+      if (debtsToDisplay.length === 0) {
+        container.innerHTML = '';
+        emptyMsg.classList.remove('hidden');
+        return;
+      }
+      emptyMsg.classList.add('hidden');
+
+      container.innerHTML = debtsToDisplay.map((debt) => `
+        <div class="p-3 bg-slate-950/70 rounded-xl border border-rose-950/60 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 flex-1 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold shrink-0 ${debt.isP1 ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-pink-950 text-pink-300 border border-pink-800'}">
+                ${debt.owner}
+              </span>
+              <input type="text" value="${debt.name || ''}" oninput="updateDebtField('${debt.id}', 'name', this.value)" placeholder="대출명 (예: 주담대)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-0.5 text-xs text-rose-300 font-bold focus:outline-none focus:border-rose-500 w-full truncate">
+            </div>
+            
+            <div class="flex items-center gap-1 shrink-0">
+              <span class="text-[11px] text-rose-300/80 font-medium">금리:</span>
+              <input type="number" step="0.1" value="${debt.rate}" oninput="updateDebtField('${debt.id}', 'rate', this.value)" class="w-14 bg-slate-900 border border-rose-900 text-center rounded px-1 py-0.5 text-xs text-rose-400 font-bold focus:border-rose-500 focus:outline-none">
+              <span class="text-xs text-rose-400">%</span>
+              <button onclick="removeDebtItem('${debt.id}')" class="text-slate-500 hover:text-rose-400 text-xs px-1.5 py-0.5 transition" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-0.5">대출 잔액</label>
+              <input type="number" step="1000000" value="${debt.amount}" oninput="updateDebtField('${debt.id}', 'amount', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
+              <div id="txt-debt-amt-${debt.id}" class="text-[10px] text-rose-400 mt-0.5 truncate">${formatKoreanWon(debt.amount)}</div>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-0.5">월 원리금 상환액</label>
+              <input type="number" step="50000" value="${debt.monthlyRepay}" oninput="updateDebtField('${debt.id}', 'monthlyRepay', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-rose-500 font-medium">
+              <div id="txt-debt-repay-${debt.id}" class="text-[10px] text-slate-400 mt-0.5 truncate">월 ${formatKoreanWon(debt.monthlyRepay)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addNewDebtItem() {
+      const targetPerson = state.activeInputTab === 'p2' ? state.p2 : state.p1;
+      if (!targetPerson.debts) targetPerson.debts = [];
+      const newId = 'd_' + Date.now();
+      targetPerson.debts.push({
+        id: newId,
+        name: '신규 대출',
+        amount: 20000000,
+        rate: 4.5,
+        monthlyRepay: 300000
+      });
+      updateAll();
+      showToast(`${targetPerson.name}의 새 대출 항목이 추가되었습니다.`);
+    }
+
+    function removeDebtItem(id) {
+      state.p1.debts = (state.p1.debts || []).filter(d => d.id !== id);
+      state.p2.debts = (state.p2.debts || []).filter(d => d.id !== id);
+      updateAll();
+      showToast('대출 항목이 삭제되었습니다.');
+    }
+
+    function updateDebtField(id, field, value) {
+      let target = (state.p1.debts || []).find(d => d.id === id);
+      if (!target) {
+        target = (state.p2.debts || []).find(d => d.id === id);
+      }
+      if (target) {
+        if (field === 'name') {
+          target.name = value;
+        } else {
+          target[field] = Math.max(0, Number(value) || 0);
+        }
+
+        // 실시간으로 해당 대출 칸 하단의 원화 텍스트 갱신
+        const amtEl = document.getElementById(`txt-debt-amt-${id}`);
+        const repayEl = document.getElementById(`txt-debt-repay-${id}`);
+        if (amtEl && field === 'amount') {
+          amtEl.innerText = formatKoreanWon(target.amount);
+        }
+        if (repayEl && field === 'monthlyRepay') {
+          repayEl.innerText = `월 ${formatKoreanWon(target.monthlyRepay)}`;
+        }
+
+        // 전체 시뮬레이션 계산 및 KPI/차트 동기화
+        const sim = calculateSimulation();
+        const current = sim.yearlyData[0];
+        const y10 = sim.yearlyData[10] || sim.yearlyData[sim.yearlyData.length - 1];
+        
+        document.getElementById('kpi-total-debt').innerText = formatKoreanWon(current.debt);
+        document.getElementById('kpi-total-debt-10y').innerText = y10.debt === 0 ? '전액 상환 🎉' : formatKoreanWon(y10.debt);
+        document.getElementById('kpi-net-worth').innerText = formatKoreanWon(current.netWorth);
+        document.getElementById('kpi-net-worth-10y').innerText = formatKoreanWon(y10.netWorth);
+        document.getElementById('val-sum-savingrate').innerText = `${sim.savingsRate}%`;
+
+        renderGrowthChart(sim.yearlyData.slice(0, state.simHorizon + 1));
+        renderMilestoneTable(sim.yearlyData);
+        renderInsights(sim, current, y10);
+        syncUrlHash();
       }
     }
 
@@ -988,8 +1151,8 @@
       const current = sim.yearlyData[0];
       const y10 = sim.yearlyData[10] || sim.yearlyData[sim.yearlyData.length - 1];
 
-      const p1Tot = Object.values(state.p1.assets).slice(0, 4).reduce((a, b) => a + b, 0);
-      const p2Tot = Object.values(state.p2.assets).slice(0, 4).reduce((a, b) => a + b, 0);
+      const p1Tot = Object.values(state.p1.assets).reduce((a, b) => a + b, 0);
+      const p2Tot = Object.values(state.p2.assets).reduce((a, b) => a + b, 0);
       const combTot = p1Tot + p2Tot || 1;
       const p1Ratio = Math.round((p1Tot / combTot) * 100);
       const p2Ratio = 100 - p1Ratio;
@@ -1012,14 +1175,14 @@
       document.getElementById('txt-stock-asset-won').innerText = formatKoreanWon(document.getElementById('inp-stock-asset').value);
       document.getElementById('txt-stock-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-stock-alloc').value)}`;
 
+      document.getElementById('txt-pension-asset-won').innerText = formatKoreanWon(document.getElementById('inp-pension-asset').value);
+      document.getElementById('txt-pension-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-pension-alloc').value)}`;
+
       document.getElementById('txt-crypto-asset-won').innerText = formatKoreanWon(document.getElementById('inp-crypto-asset').value);
       document.getElementById('txt-crypto-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-crypto-alloc').value)}`;
 
       document.getElementById('txt-cash-asset-won').innerText = formatKoreanWon(document.getElementById('inp-cash-asset').value);
       document.getElementById('txt-cash-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-cash-alloc').value)}`;
-
-      document.getElementById('txt-debt-asset-won').innerText = formatKoreanWon(document.getElementById('inp-debt-asset').value);
-      document.getElementById('txt-debt-alloc-won').innerText = `월 ${formatKoreanWon(document.getElementById('inp-debt-alloc').value)}`;
 
       document.getElementById('comb-income-val').innerText = formatKoreanWon(sim.totalIncome);
       document.getElementById('comb-income-sub').innerText = `(본인: ${formatKoreanWon(state.p1.income)} / 배우자: ${formatKoreanWon(state.p2.income)})`;
@@ -1058,7 +1221,7 @@
     }
 
     function addValueTo(field, addAmount) {
-      const p = state.activeInputTab === 'p1' ? state.p1 : state.p2;
+      const p = state.activeInputTab === 'p2' ? state.p2 : state.p1;
       p[field] = (Number(p[field]) || 0) + addAmount;
       updateAll();
     }
@@ -1147,10 +1310,10 @@
     }
 
     function renderPieCharts(curr, y10) {
-      const colors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'];
-      const categories = ['부동산', '주식', '코인', '현금'];
-      const curValues = [curr.realEstate, curr.stocks, curr.crypto, curr.cash];
-      const y10Values = [y10.realEstate, y10.stocks, y10.crypto, y10.cash];
+      const colors = ['#3B82F6', '#10B981', '#06B6D4', '#F59E0B', '#8B5CF6'];
+      const categories = ['부동산', '주식', '연금', '코인', '현금'];
+      const curValues = [curr.realEstate, curr.stocks, curr.pension, curr.crypto, curr.cash];
+      const y10Values = [y10.realEstate, y10.stocks, y10.pension, y10.crypto, y10.cash];
 
       if (currentPieInstance) currentPieInstance.destroy();
       const ctxCur = document.getElementById('currentPieChart').getContext('2d');
@@ -1206,6 +1369,10 @@
           ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.stocks)}</td>`).join('')}
         </tr>
         <tr class="hover:bg-slate-800/30">
+          <td class="py-3 px-3 text-cyan-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-piggy-bank"></i> 개인/퇴직연금</td>
+          ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.pension)}</td>`).join('')}
+        </tr>
+        <tr class="hover:bg-slate-800/30">
           <td class="py-3 px-3 text-amber-400 font-semibold flex items-center gap-1.5"><i class="fa-brands fa-bitcoin"></i> 코인</td>
           ${ms.map(m => `<td class="py-3 px-3 text-slate-200">${formatKoreanWon(m.crypto)}</td>`).join('')}
         </tr>
@@ -1218,7 +1385,7 @@
           ${ms.map(m => `<td class="py-3 px-3">${formatKoreanWon(m.totalAssets)}</td>`).join('')}
         </tr>
         <tr class="text-rose-400 bg-rose-950/20">
-          <td class="py-3 px-3 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-credit-card"></i> 부채 (빚/대출)</td>
+          <td class="py-3 px-3 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-credit-card"></i> 부채 (세부 대출 합계)</td>
           ${ms.map(m => `<td class="py-3 px-3 font-bold">${m.debt === 0 ? '0원' : `-${formatKoreanWon(m.debt)}`}</td>`).join('')}
         </tr>
         <tr class="bg-emerald-950/40 font-extrabold text-emerald-300 border-t-2 border-emerald-500/40 text-sm">
@@ -1230,32 +1397,34 @@
 
     function renderInsights(sim, curr, y10) {
       const sr = Number(sim.savingsRate);
-      let srHtml = `부부 합산 세후 소득 중 <strong>${sim.savingsRate}%</strong>를 저축 및 자산 증식에 투입하고 있습니다. `;
+      let srHtml = `부부 합산 세후 소득 중 <strong>${sim.savingsRate}%</strong>를 저축·연금·투자 및 대출 원리금 상환에 투입하고 있습니다. `;
       if (sr >= 50) {
-        srHtml += `<span class="text-emerald-400 block mt-1">🌟 매우 이상적인 가구 저축률입니다! 두 분의 소득 합산 효과로 복리 성장 속도가 극대화됩니다.</span>`;
+        srHtml += `<span class="text-emerald-400 block mt-1">🌟 매우 이상적인 가구 저축률입니다! 복리 성장 속도가 극대화됩니다.</span>`;
       } else if (sr >= 30) {
-        srHtml += `<span class="text-indigo-300 block mt-1">👍 표준적이고 안정적인 저축률입니다. 고정 지출을 5~10%만 절감해도 10년 뒤 순자산이 수억 원 이상 더 늘어납니다.</span>`;
+        srHtml += `<span class="text-indigo-300 block mt-1">👍 표준적이고 안정적인 저축률입니다.</span>`;
       } else {
-        srHtml += `<span class="text-amber-400 block mt-1">⚠️ 저축률이 다소 낮습니다. 부부 간 공동 가계부를 점검하여 월 저축액을 늘리면 복리의 가속도가 훨씬 빨라집니다.</span>`;
+        srHtml += `<span class="text-amber-400 block mt-1">⚠️ 저축 및 상환 비중이 다소 낮습니다.</span>`;
       }
       document.getElementById('insight-saving-text').innerHTML = srHtml;
 
       let riskHtml = '';
       if (curr.totalAssets > 0 && (curr.crypto / curr.totalAssets) * 100 > 25) {
-        riskHtml = `<span class="text-amber-400">가상자산(코인) 비중이 총자산의 25%를 초과하여 변동성 위험이 있습니다. 상승장 시기 점진적으로 우량 주식 및 현금성 자산으로 리밸런싱을 권장합니다.</span>`;
-      } else if (curr.totalAssets > 0 && (curr.realEstate / curr.totalAssets) * 100 > 75) {
-        riskHtml = `<span class="text-blue-300">부동산 비중이 높아 금융 유동성이 제한될 수 있습니다. 배당주, 파킹 통장 등 유동 자산 비중을 20% 이상 확보하는 것이 유리합니다.</span>`;
+        riskHtml = `<span class="text-amber-400">가상자산(코인) 비중이 높아 변동성 리스크가 큽니다. 우량 주식 및 세제혜택 연금(IRP/연금저축)으로 분산 이전을 권장합니다.</span>`;
+      } else if (curr.totalAssets > 0 && ((curr.stocks + curr.pension) / curr.totalAssets) * 100 >= 30) {
+        riskHtml = `<span class="text-emerald-300">주식과 세제혜택 연금 계좌의 균형이 우수하여 절세와 복리 증식 효과를 동시에 누릴 수 있는 구조입니다.</span>`;
       } else {
-        riskHtml = `<span class="text-emerald-300">부동산, 주식, 코인, 현금이 균형 있게 분산되어 있어 시장 사이클 변화에 방어력이 우수한 가구 포트폴리오입니다.</span>`;
+        riskHtml = `<span class="text-blue-300">부동산, 주식, 연금, 현금이 균형 있게 분산되어 안정적입니다.</span>`;
       }
       document.getElementById('insight-risk-text').innerHTML = riskHtml;
 
       const debtRatio = curr.totalAssets > 0 ? ((curr.debt / curr.totalAssets) * 100).toFixed(1) : 0;
-      let debtHtml = `현재 가구 총자산 대비 부채 비율은 <strong>${debtRatio}%</strong>입니다. `;
-      if (curr.debt > 0 && state.returns.debtRate > state.returns.cash) {
-        debtHtml += `<span class="text-rose-300 block mt-1">대출 금리(${state.returns.debtRate}%)가 예금 금리(${state.returns.cash}%)보다 높으므로, 여유 현금 발생 시 고금리 부채를 우선 상환하는 것이 확실한 무위험 확정 수익이 됩니다.</span>`;
+      let debtHtml = `현재 가구 총자산 대비 부채 비율은 <strong>${debtRatio}%</strong> (총 ${formatKoreanWon(curr.debt)})입니다. `;
+      const allDebts = [...(state.p1.debts || []), ...(state.p2.debts || [])];
+      const highRateDebt = allDebts.find(d => Number(d.rate) >= 5.0 && Number(d.amount) > 0);
+      if (highRateDebt) {
+        debtHtml += `<span class="text-rose-300 block mt-1">고금리 대출(${highRateDebt.name} ${highRateDebt.rate}%)이 포함되어 있으므로 여유자금 발생 시 조기상환을 추천합니다.</span>`;
       } else {
-        debtHtml += `<span class="text-emerald-300 block mt-1">부채 규모가 안전 범위 내에 잘 통제되고 있습니다.</span>`;
+        debtHtml += `<span class="text-emerald-300 block mt-1">대출이 안전한 금리 범위 내에서 원리금 상환 계획대로 관리되고 있습니다.</span>`;
       }
       document.getElementById('insight-debt-text').innerHTML = debtHtml;
 
@@ -1286,7 +1455,7 @@
       const bindAsset = (inpId, field, isAlloc = false) => {
         document.getElementById(inpId).addEventListener('input', (e) => {
           const val = Math.max(0, Number(e.target.value) || 0);
-          const p = state.activeInputTab === 'p1' ? state.p1 : (state.activeInputTab === 'p2' ? state.p2 : null);
+          const p = state.activeInputTab === 'p1' ? state.p1 : (state.activeInputTab === 'p2' ? state.p2 : state.p1);
           if (p) {
             if (isAlloc) p.allocations[field] = val;
             else p.assets[field] = val;
@@ -1299,12 +1468,12 @@
       bindAsset('inp-re-alloc', 'realEstate', true);
       bindAsset('inp-stock-asset', 'stocks', false);
       bindAsset('inp-stock-alloc', 'stocks', true);
+      bindAsset('inp-pension-asset', 'pension', false);
+      bindAsset('inp-pension-alloc', 'pension', true);
       bindAsset('inp-crypto-asset', 'crypto', false);
       bindAsset('inp-crypto-alloc', 'crypto', true);
       bindAsset('inp-cash-asset', 'cash', false);
       bindAsset('inp-cash-alloc', 'cash', true);
-      bindAsset('inp-debt-asset', 'debt', false);
-      bindAsset('inp-debt-alloc', 'debtRepayment', true);
 
       const bindRate = (inpId, field) => {
         document.getElementById(inpId).addEventListener('input', (e) => {
@@ -1314,9 +1483,9 @@
       };
       bindRate('rate-realestate', 'realEstate');
       bindRate('rate-stocks', 'stocks');
+      bindRate('rate-pension', 'pension');
       bindRate('rate-crypto', 'crypto');
       bindRate('rate-cash', 'cash');
-      bindRate('rate-debt', 'debtRate');
     }
 
     function switchInputTab(tab) {
@@ -1369,7 +1538,6 @@
       applyPreset('newlywed');
     }
 
-    // Native Web Share API or Modal
     async function handleQuickShare() {
       const shareUrl = window.location.href;
       if (navigator.share) {
@@ -1452,15 +1620,16 @@ ${shareUrl}`;
 ■ 가구 재무 현황 (합산)
 • 세후 월 소득: ${formatKoreanWon(sim.totalIncome)} (본인: ${formatKoreanWon(state.p1.income)} / 배우자: ${formatKoreanWon(state.p2.income)})
 • 월 생활 지출: ${formatKoreanWon(sim.totalExpense)}
-• 월 저축/투자액: ${formatKoreanWon(sim.totalAlloc)} (가구 저축률 ${sim.savingsRate}%)
+• 월 저축/투자/상환액: ${formatKoreanWon(sim.totalAlloc)} (가구 저축률 ${sim.savingsRate}%)
 
 ■ 자산 현황 (현재)
 • 가구 총자산: ${formatKoreanWon(current.totalAssets)}
   - 부동산: ${formatKoreanWon(current.realEstate)}
   - 주식: ${formatKoreanWon(current.stocks)}
+  - 개인/퇴직연금: ${formatKoreanWon(current.pension)}
   - 코인: ${formatKoreanWon(current.crypto)}
   - 현금: ${formatKoreanWon(current.cash)}
-• 가구 총부채(빚): ${formatKoreanWon(current.debt)} (본인: ${formatKoreanWon(state.p1.assets.debt)} / 배우자: ${formatKoreanWon(state.p2.assets.debt)})
+• 가구 총부채(빚): ${formatKoreanWon(current.debt)}
 • 가구 순자산: ${formatKoreanWon(current.netWorth)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1503,7 +1672,9 @@ ${shareUrl}`;
           if (decoded.r) state.returns = decoded.r;
           showToast('공유받은 시뮬레이션 데이터를 불러왔습니다!');
         }
-      } catch (err) {}
+      } catch (err) {
+        console.error('URL Data load error:', err);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
