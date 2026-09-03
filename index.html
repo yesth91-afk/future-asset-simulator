@@ -65,6 +65,7 @@
     <span id="toastMsg">알림 메시지</span>
   </div>
 
+  <!-- Header -->
   <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -82,6 +83,7 @@
         </div>
       </div>
 
+      <!-- Header Actions -->
       <div class="flex items-center gap-2">
         <button onclick="openShareModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition active:scale-95">
           <i class="fa-solid fa-share-nodes"></i>
@@ -95,6 +97,7 @@
     </div>
   </header>
 
+  <!-- Presets Bar -->
   <div class="bg-slate-900/40 border-b border-slate-800/80 py-2.5 px-4 sm:px-6">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
       <div class="flex items-center gap-2 text-slate-300">
@@ -118,6 +121,7 @@
     </div>
   </div>
 
+  <!-- Main Content Layout -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
     
     <!-- LEFT COLUMN: CONTROLS & INPUTS -->
@@ -233,9 +237,21 @@
             </div>
           </div>
 
-          <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-            <span class="text-slate-400">월 잉여 여유자금</span>
-            <span id="txt-surplus-won" class="text-emerald-400 font-bold text-sm">0원</span>
+          <!-- 월 잉여 여유자금 상세 계산식 안내 카드 -->
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <div>
+                <span class="text-slate-200 font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-calculator text-emerald-400"></i> 월 잉여 여유자금
+                </span>
+                <span class="text-[10px] text-slate-400 block mt-0.5">
+                  (세후 소득 - 생활비 - 대출이자 - 대출원금 - 자산투자(본인부담))
+                </span>
+              </div>
+              <span id="txt-surplus-won" class="text-emerald-400 font-black text-sm sm:text-base">0원</span>
+            </div>
+            <!-- 실시간 계산 브레이크다운 -->
+            <div id="txt-surplus-breakdown" class="text-[10px] text-slate-400 pt-1.5 border-t border-slate-800/80 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono"></div>
           </div>
         </div>
 
@@ -285,12 +301,21 @@
             </div>
           </div>
 
-          <div class="p-2.5 bg-slate-950 rounded-xl border border-emerald-900/40 flex justify-between items-center">
-            <div>
-              <span class="text-slate-300 font-medium">가구 월 잉여 여유자금</span>
-              <span class="text-[10px] text-slate-500 block">(소득 - 생활비 - 대출이자 - 대출원금 - 자산월투자액)</span>
+          <!-- 가구 합산 월 잉여 여유자금 상세 계산식 안내 카드 -->
+          <div class="p-3 bg-slate-950 rounded-xl border border-emerald-900/40 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <div>
+                <span class="text-slate-200 font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-calculator text-emerald-400"></i> 가구 월 잉여 여유자금
+                </span>
+                <span class="text-[10px] text-slate-400 block mt-0.5">
+                  (가구 총소득 - 생활비 - 대출이자 - 대출원금 - 자산투자(본인부담))
+                </span>
+              </div>
+              <div id="comb-surplus-val" class="text-emerald-400 font-black text-sm sm:text-base">0원</div>
             </div>
-            <div id="comb-surplus-val" class="text-emerald-400 font-bold text-sm">0원</div>
+            <!-- 실시간 계산 브레이크다운 -->
+            <div id="comb-surplus-breakdown" class="text-[10px] text-slate-400 pt-1.5 border-t border-slate-800/80 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono"></div>
           </div>
         </div>
 
@@ -324,7 +349,7 @@
         </div>
       </div>
 
-      <!-- 2. 자산 현황 테이블 (완전 커스텀 추가/삭제/수정/감가상각 지원) -->
+      <!-- 2. 자산 현황 테이블 (완전 커스텀 추가/삭제/수정/감가상각 & 본인부담 체크박스 지원) -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5">
         <div class="flex items-center justify-between pb-3 border-b border-slate-800">
           <div class="flex items-center gap-2">
@@ -758,11 +783,11 @@
           { id: 'p1_b2', name: '경영성과급', amount: 8000000, investRatio: 70 }
         ],
         assets: [
-          { id: 'p1_a1', name: '부동산(아파트)', amount: 50000000, rate: 4.0, monthlyAlloc: 0, color: '#3B82F6' },
-          { id: 'p1_a2', name: '국내/해외 주식', amount: 40000000, rate: 9.5, monthlyAlloc: 800000, color: '#10B981' },
-          { id: 'p1_a3', name: '개인/퇴직연금(IRP)', amount: 15000000, rate: 6.5, monthlyAlloc: 300000, color: '#06B6D4' },
-          { id: 'p1_a4', name: '코인(가상자산)', amount: 20000000, rate: 12.0, monthlyAlloc: 300000, color: '#F59E0B' },
-          { id: 'p1_a5', name: '현금/예적금', amount: 15000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6' }
+          { id: 'p1_a1', name: '부동산(아파트)', amount: 50000000, rate: 4.0, monthlyAlloc: 0, color: '#3B82F6', deductFromSurplus: true },
+          { id: 'p1_a2', name: '국내/해외 주식', amount: 40000000, rate: 9.5, monthlyAlloc: 800000, color: '#10B981', deductFromSurplus: true },
+          { id: 'p1_a3', name: '개인/퇴직연금(IRP)', amount: 15000000, rate: 6.5, monthlyAlloc: 300000, color: '#06B6D4', deductFromSurplus: true },
+          { id: 'p1_a4', name: '코인(가상자산)', amount: 20000000, rate: 12.0, monthlyAlloc: 300000, color: '#F59E0B', deductFromSurplus: true },
+          { id: 'p1_a5', name: '현금/예적금', amount: 15000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6', deductFromSurplus: true }
         ],
         debts: [
           { id: 'p1_d1', name: '주택담보대출', amount: 30000000, rate: 4.2, monthlyPrincipal: 250000, monthlyInterest: 105000 },
@@ -778,9 +803,9 @@
           { id: 'p2_b1', name: '연말 성과급', amount: 4000000, investRatio: 80 }
         ],
         assets: [
-          { id: 'p2_a1', name: '주식/ETF', amount: 25000000, rate: 9.0, monthlyAlloc: 500000, color: '#10B981' },
-          { id: 'p2_a2', name: '연금저축펀드', amount: 10000000, rate: 6.5, monthlyAlloc: 200000, color: '#06B6D4' },
-          { id: 'p2_a3', name: '현금/비상금', amount: 15000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6' }
+          { id: 'p2_a1', name: '주식/ETF', amount: 25000000, rate: 9.0, monthlyAlloc: 500000, color: '#10B981', deductFromSurplus: true },
+          { id: 'p2_a2', name: '연금저축펀드', amount: 10000000, rate: 6.5, monthlyAlloc: 200000, color: '#06B6D4', deductFromSurplus: true },
+          { id: 'p2_a3', name: '현금/비상금', amount: 15000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6', deductFromSurplus: true }
         ],
         debts: [
           { id: 'p2_d1', name: '회사 복지대출', amount: 15000000, rate: 3.0, monthlyPrincipal: 150000, monthlyInterest: 37500 }
@@ -797,10 +822,10 @@
           monthlyExpense: 1800000,
           bonuses: [{ id: 'b1', name: '성과급', amount: 6000000, investRatio: 80 }],
           assets: [
-            { id: 'a1', name: '국내/해외주식', amount: 35000000, rate: 9.0, monthlyAlloc: 1000000, color: '#10B981' },
-            { id: 'a2', name: '개인연금(IRP)', amount: 15000000, rate: 6.5, monthlyAlloc: 300000, color: '#06B6D4' },
-            { id: 'a3', name: '가상자산', amount: 10000000, rate: 12.0, monthlyAlloc: 200000, color: '#F59E0B' },
-            { id: 'a4', name: '청약 및 현금', amount: 20000000, rate: 3.2, monthlyAlloc: 400000, color: '#8B5CF6' }
+            { id: 'a1', name: '국내/해외주식', amount: 35000000, rate: 9.0, monthlyAlloc: 1000000, color: '#10B981', deductFromSurplus: true },
+            { id: 'a2', name: '개인연금(IRP)', amount: 15000000, rate: 6.5, monthlyAlloc: 300000, color: '#06B6D4', deductFromSurplus: true },
+            { id: 'a3', name: '가상자산', amount: 10000000, rate: 12.0, monthlyAlloc: 200000, color: '#F59E0B', deductFromSurplus: true },
+            { id: 'a4', name: '청약 및 현금', amount: 20000000, rate: 3.2, monthlyAlloc: 400000, color: '#8B5CF6', deductFromSurplus: true }
           ],
           debts: [{ id: 'd1', name: '전세자금대출', amount: 20000000, rate: 4.5, monthlyPrincipal: 250000, monthlyInterest: 75000 }]
         },
@@ -811,9 +836,9 @@
           monthlyExpense: 1400000,
           bonuses: [{ id: 'b2', name: '상여금', amount: 3000000, investRatio: 70 }],
           assets: [
-            { id: 'a5', name: '주식/ETF', amount: 20000000, rate: 9.0, monthlyAlloc: 600000, color: '#10B981' },
-            { id: 'a6', name: '연금저축', amount: 10000000, rate: 6.5, monthlyAlloc: 200000, color: '#06B6D4' },
-            { id: 'a7', name: '예적금', amount: 15000000, rate: 3.2, monthlyAlloc: 400000, color: '#8B5CF6' }
+            { id: 'a5', name: '주식/ETF', amount: 20000000, rate: 9.0, monthlyAlloc: 600000, color: '#10B981', deductFromSurplus: true },
+            { id: 'a6', name: '연금저축', amount: 10000000, rate: 6.5, monthlyAlloc: 200000, color: '#06B6D4', deductFromSurplus: true },
+            { id: 'a7', name: '예적금', amount: 15000000, rate: 3.2, monthlyAlloc: 400000, color: '#8B5CF6', deductFromSurplus: true }
           ],
           debts: [{ id: 'd2', name: '신용대출', amount: 10000000, rate: 5.2, monthlyPrincipal: 150000, monthlyInterest: 43000 }]
         }
@@ -826,10 +851,10 @@
           monthlyExpense: 2200000,
           bonuses: [{ id: 'b1', name: '경영성과급', amount: 12000000, investRatio: 80 }],
           assets: [
-            { id: 'a1', name: '아파트 부동산', amount: 500000000, rate: 4.2, monthlyAlloc: 0, color: '#3B82F6' },
-            { id: 'a2', name: '주식/ETF', amount: 30000000, rate: 8.5, monthlyAlloc: 800000, color: '#10B981' },
-            { id: 'a3', name: '개인/퇴직연금', amount: 25000000, rate: 6.0, monthlyAlloc: 300000, color: '#06B6D4' },
-            { id: 'a4', name: '비상금 통장', amount: 20000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6' }
+            { id: 'a1', name: '아파트 부동산', amount: 500000000, rate: 4.2, monthlyAlloc: 0, color: '#3B82F6', deductFromSurplus: true },
+            { id: 'a2', name: '주식/ETF', amount: 30000000, rate: 8.5, monthlyAlloc: 800000, color: '#10B981', deductFromSurplus: true },
+            { id: 'a3', name: '개인/퇴직연금', amount: 25000000, rate: 6.0, monthlyAlloc: 300000, color: '#06B6D4', deductFromSurplus: true },
+            { id: 'a4', name: '비상금 통장', amount: 20000000, rate: 3.0, monthlyAlloc: 300000, color: '#8B5CF6', deductFromSurplus: true }
           ],
           debts: [
             { id: 'd1', name: '아파트 주담대', amount: 250000000, rate: 4.2, monthlyPrincipal: 850000, monthlyInterest: 875000 },
@@ -843,9 +868,9 @@
           monthlyExpense: 1800000,
           bonuses: [{ id: 'b2', name: '연말보너스', amount: 5000000, investRatio: 80 }],
           assets: [
-            { id: 'a5', name: '부동산 지분', amount: 200000000, rate: 4.2, monthlyAlloc: 0, color: '#3B82F6' },
-            { id: 'a6', name: '미국 배당주', amount: 15000000, rate: 8.0, monthlyAlloc: 400000, color: '#10B981' },
-            { id: 'a7', name: '연금저축', amount: 15000000, rate: 6.0, monthlyAlloc: 200000, color: '#06B6D4' }
+            { id: 'a5', name: '부동산 지분', amount: 200000000, rate: 4.2, monthlyAlloc: 0, color: '#3B82F6', deductFromSurplus: true },
+            { id: 'a6', name: '미국 배당주', amount: 15000000, rate: 8.0, monthlyAlloc: 400000, color: '#10B981', deductFromSurplus: true },
+            { id: 'a7', name: '연금저축', amount: 15000000, rate: 6.0, monthlyAlloc: 200000, color: '#06B6D4', deductFromSurplus: true }
           ],
           debts: [{ id: 'd3', name: '주담대 분담', amount: 100000000, rate: 4.2, monthlyPrincipal: 350000, monthlyInterest: 350000 }]
         }
@@ -858,11 +883,11 @@
           monthlyExpense: 1500000,
           bonuses: [{ id: 'b1', name: '성과급', amount: 5000000, investRatio: 90 }],
           assets: [
-            { id: 'a1', name: '국내/해외주식', amount: 30000000, rate: 10.0, monthlyAlloc: 900000, color: '#10B981' },
-            { id: 'a2', name: '연금저축/IRP', amount: 15000000, rate: 7.0, monthlyAlloc: 300000, color: '#06B6D4' },
-            { id: 'a3', name: '가상자산', amount: 15000000, rate: 15.0, monthlyAlloc: 300000, color: '#F59E0B' },
-            { id: 'a4', name: '자동차 (감가상각)', amount: 25000000, rate: -10.0, monthlyAlloc: 0, color: '#F97316' },
-            { id: 'a5', name: '비상금', amount: 10000000, rate: 3.0, monthlyAlloc: 500000, color: '#8B5CF6' }
+            { id: 'a1', name: '국내/해외주식', amount: 30000000, rate: 10.0, monthlyAlloc: 900000, color: '#10B981', deductFromSurplus: true },
+            { id: 'a2', name: '연금저축/IRP', amount: 15000000, rate: 7.0, monthlyAlloc: 300000, color: '#06B6D4', deductFromSurplus: true },
+            { id: 'a3', name: '가상자산', amount: 15000000, rate: 15.0, monthlyAlloc: 300000, color: '#F59E0B', deductFromSurplus: true },
+            { id: 'a4', name: '자동차 (감가상각)', amount: 25000000, rate: -10.0, monthlyAlloc: 0, color: '#F97316', deductFromSurplus: true },
+            { id: 'a5', name: '비상금', amount: 10000000, rate: 3.0, monthlyAlloc: 500000, color: '#8B5CF6', deductFromSurplus: true }
           ],
           debts: []
         },
@@ -924,6 +949,7 @@
       const totalDebtPrincipalMonthly = p1DebtPrincipalMonthly + p2DebtPrincipalMonthly;
       const totalDebtInterestMonthly = p1DebtInterestMonthly + p2DebtInterestMonthly;
 
+      // 성과급 투자분 합산
       const p1BonusInvestAnnual = (state.p1.bonuses || []).reduce((sum, b) => sum + (Number(b.amount) || 0) * ((Number(b.investRatio) || 0) / 100), 0);
       const p2BonusInvestAnnual = (state.p2.bonuses || []).reduce((sum, b) => sum + (Number(b.amount) || 0) * ((Number(b.investRatio) || 0) / 100), 0);
       const totalBonusInvestAnnual = p1BonusInvestAnnual + p2BonusInvestAnnual;
@@ -932,8 +958,21 @@
       const totalMonthlyPureExpense = (state.p1.monthlyExpense || 0) + (state.p2.monthlyExpense || 0);
       
       const totalMonthlyExpenseWithInterest = totalMonthlyPureExpense + totalDebtInterestMonthly;
-      const totalMonthlyAssetAlloc = allAssets.reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
-      const totalMonthlySavingsAndPrincipal = totalMonthlyAssetAlloc + totalDebtPrincipalMonthly;
+
+      // 본인 부담 자산 투자액 vs 외부/회사 지원 자산 투자액 분리
+      const p1SelfAssetAlloc = allP1Assets
+        .filter(a => a.deductFromSurplus !== false)
+        .reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
+      const p2SelfAssetAlloc = allP2Assets
+        .filter(a => a.deductFromSurplus !== false)
+        .reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
+
+      const totalSelfAssetAlloc = p1SelfAssetAlloc + p2SelfAssetAlloc;
+      const totalExternalAssetAlloc = allAssets
+        .filter(a => a.deductFromSurplus === false)
+        .reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
+
+      const totalMonthlySavingsAndPrincipal = totalSelfAssetAlloc + totalDebtPrincipalMonthly;
 
       const currentInitialTotalAsset = allAssets.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
       let weightedRateSum = 0;
@@ -1011,6 +1050,10 @@
         p1DebtInterestMonthly,
         p2DebtPrincipalMonthly,
         p2DebtInterestMonthly,
+        p1SelfAssetAlloc,
+        p2SelfAssetAlloc,
+        totalSelfAssetAlloc,
+        totalExternalAssetAlloc,
         totalDebtPrincipalMonthly,
         totalDebtInterestMonthly,
         totalMonthlyIncome,
@@ -1246,6 +1289,17 @@
               <div id="txt-asset-alloc-${asset.id}" class="text-[10px] text-slate-400 mt-0.5 truncate">월 ${formatKoreanWon(asset.monthlyAlloc)}</div>
             </div>
           </div>
+
+          <!-- 월 잉여금 차감 여부 체크박스 -->
+          <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+            <label class="flex items-center gap-1.5 cursor-pointer select-none text-slate-300 hover:text-white">
+              <input type="checkbox" ${asset.deductFromSurplus !== false ? 'checked' : ''} onchange="updateAssetField('${asset.id}', 'deductFromSurplus', this.checked)" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0 cursor-pointer">
+              <span>내 월소득에서 지출 (월 잉여금에서 차감)</span>
+            </label>
+            <span class="text-[10px] ${asset.deductFromSurplus !== false ? 'text-slate-500' : 'text-indigo-400 font-semibold'}">
+              ${asset.deductFromSurplus !== false ? '본인 부담' : '회사/외부 지원 (잉여금 미차감)'}
+            </span>
+          </div>
         </div>
       `).join('');
     }
@@ -1261,7 +1315,8 @@
         amount: 10000000,
         rate: 5.0,
         monthlyAlloc: 200000,
-        color: color
+        color: color,
+        deductFromSurplus: true
       });
       updateAll();
       showToast(`${targetPerson.name}의 새 자산 항목이 추가되었습니다.`);
@@ -1279,6 +1334,10 @@
       if (target) {
         if (field === 'name' || field === 'color') {
           target[field] = value;
+        } else if (field === 'deductFromSurplus') {
+          target[field] = Boolean(value);
+          updateAll();
+          return;
         } else {
           target[field] = Number(value) || 0;
         }
@@ -1443,6 +1502,7 @@
 
       const indivPrin = isP1 ? sim.p1DebtPrincipalMonthly : (isP2 ? sim.p2DebtPrincipalMonthly : 0);
       const indivInt = isP1 ? sim.p1DebtInterestMonthly : (isP2 ? sim.p2DebtInterestMonthly : 0);
+      const indivSelfAsset = isP1 ? sim.p1SelfAssetAlloc : (isP2 ? sim.p2SelfAssetAlloc : 0);
 
       const indivPrinEl = document.getElementById('indiv-debt-principal-val');
       const indivIntEl = document.getElementById('indiv-debt-interest-val');
@@ -1457,18 +1517,58 @@
       const bonusInvestEl = document.getElementById('txt-total-bonus-invest');
       if (bonusInvestEl) bonusInvestEl.innerText = formatKoreanWon(sim.totalBonusInvestAnnual);
 
+      // 개별 월 잉여금 갱신 및 실시간 계산 상세 breakdown
       const curPerson = isP1 ? state.p1 : state.p2;
       const curIncome = curPerson ? curPerson.monthlyIncome : 0;
       const curExpense = curPerson ? curPerson.monthlyExpense : 0;
-      const curAssetAlloc = (curPerson ? curPerson.assets || [] : []).reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
-      const curSurplus = curIncome - (curExpense + indivInt + indivPrin + curAssetAlloc);
-      const surplusEl = document.getElementById('txt-surplus-won');
-      if (surplusEl) surplusEl.innerText = formatKoreanWon(Math.max(0, curSurplus));
+      const curExternalAsset = (curPerson ? curPerson.assets || [] : [])
+        .filter(a => a.deductFromSurplus === false)
+        .reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
 
-      const combAssetAlloc = sim.allAssets.reduce((sum, a) => sum + (Number(a.monthlyAlloc) || 0), 0);
-      const combSurplus = sim.totalMonthlyIncome - (sim.totalMonthlyPureExpense + sim.totalDebtInterestMonthly + sim.totalDebtPrincipalMonthly + combAssetAlloc);
+      const curSurplus = curIncome - (curExpense + indivInt + indivPrin + indivSelfAsset);
+      const surplusEl = document.getElementById('txt-surplus-won');
+      if (surplusEl) surplusEl.innerText = formatKoreanWon(curSurplus);
+
+      const surplusBreakdownEl = document.getElementById('txt-surplus-breakdown');
+      if (surplusBreakdownEl) {
+        surplusBreakdownEl.innerHTML = `
+          <span class="text-slate-300">소득 ${formatShortCurrency(curIncome)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-rose-300">생활비 ${formatShortCurrency(curExpense)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-rose-400">이자 ${formatShortCurrency(indivInt)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-emerald-400">원금 ${formatShortCurrency(indivPrin)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-indigo-300">자산투자 ${formatShortCurrency(indivSelfAsset)}</span>
+          ${curExternalAsset > 0 ? `<span class="text-cyan-400 font-semibold">(회사지원 ${formatShortCurrency(curExternalAsset)} 잉여금미차감)</span>` : ''}
+          <span class="text-slate-600">=</span>
+          <span class="font-bold text-emerald-400">${formatKoreanWon(curSurplus)}</span>
+        `;
+      }
+
+      // 가구 합산 월 잉여금 갱신 및 실시간 계산 상세 breakdown
+      const combSurplus = sim.totalMonthlyIncome - (sim.totalMonthlyPureExpense + sim.totalDebtInterestMonthly + sim.totalDebtPrincipalMonthly + sim.totalSelfAssetAlloc);
       const combSurplusEl = document.getElementById('comb-surplus-val');
-      if (combSurplusEl) combSurplusEl.innerText = formatKoreanWon(Math.max(0, combSurplus));
+      if (combSurplusEl) combSurplusEl.innerText = formatKoreanWon(combSurplus);
+
+      const combBreakdownEl = document.getElementById('comb-surplus-breakdown');
+      if (combBreakdownEl) {
+        combBreakdownEl.innerHTML = `
+          <span class="text-slate-300">총소득 ${formatShortCurrency(sim.totalMonthlyIncome)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-rose-300">생활비 ${formatShortCurrency(sim.totalMonthlyPureExpense)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-rose-400">이자 ${formatShortCurrency(sim.totalDebtInterestMonthly)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-emerald-400">원금 ${formatShortCurrency(sim.totalDebtPrincipalMonthly)}</span>
+          <span class="text-slate-600">-</span>
+          <span class="text-indigo-300">본인투자 ${formatShortCurrency(sim.totalSelfAssetAlloc)}</span>
+          ${sim.totalExternalAssetAlloc > 0 ? `<span class="text-cyan-400 font-semibold">(회사지원 ${formatShortCurrency(sim.totalExternalAssetAlloc)} 잉여금미차감)</span>` : ''}
+          <span class="text-slate-600">=</span>
+          <span class="font-bold text-emerald-400">${formatKoreanWon(combSurplus)}</span>
+        `;
+      }
 
       const growthPct = current.netWorth > 0 ? Math.round(((y10.netWorth - current.netWorth) / current.netWorth) * 100) : 0;
       document.getElementById('kpi-growth-badge').innerText = `${growthPct > 0 ? '+' : ''}${growthPct}%`;
@@ -1506,7 +1606,6 @@
       document.getElementById('label-proportions').innerText = `본인 ${p1Ratio}% : 배우자 ${p2Ratio}%`;
       document.getElementById('bar-p1-ratio').style.width = `${p1Ratio}%`;
       document.getElementById('bar-p2-ratio').style.width = `${p2Ratio}%`;
-      document.getElementById('val-sum-income').innerText = formatKoreanWon(sim.totalMonthlyIncome);
       document.getElementById('val-sum-savingrate').innerText = `${sim.savingsRate}%`;
       document.getElementById('val-sum-weighted-rate').innerText = `${Number(sim.weightedAverageRate) >= 0 ? '+' : ''}${sim.weightedAverageRate}%/연`;
 
